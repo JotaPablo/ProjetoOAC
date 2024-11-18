@@ -361,7 +361,7 @@ public class Architecture {
 	/**
 	 * This method implements the microprogram for
 	 * 					ADD <regA> <mem> // <mem> <- <mem> + <regA> 
-	 * In the machine language this command number is 3
+	 * In the machine language this command number is 2
 	 * 
 	 * The method reads the value from memory (position address) and the register id(<regA>), in positions just after 
 	 * the command, and performs an add with those values.
@@ -442,6 +442,83 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore();
 	}
+	
+	/**
+	 * This method implements the microprogram for
+	 * 					ADD <imm> <regA> // <regA> <- <imm> + <regA> 
+	 * In the machine language this command number is 3
+	 * 
+	 * The method reads the value from the position after the command and the register id(<regA>), in positions just after 
+	 * the command, and performs an add with those values.
+	 *     
+	 * The final result must be in regA.
+	 * 
+	 * 1. pc -> intbus2 // pc.internalRead()
+	 * 2. ula <- intbus2 // ula.internalStore(1)
+	 * 3. ula incs // ula.inc()
+	 * 4. ula -> intbus2 // ula.internalRead(1)
+	 * 5. pc <- intbus2 // pc.internalStore() now pc points to the first parameter (the memory position)
+	 * 6. pc -> extbus // pc.read() the address where is the position to be read is now in the external bus
+	 * 7. memory reads from extbus // memory writes data value to extbus
+	 * 9. ir <- extbus // ir.store() the data value is now in ir
+	 * 10. pc -> intbus2 // pc.internalRead()
+	 * 11. ula <- intbus2 // ula.internalStore(1)
+	 * 12. ula incs // ula.inc()
+	 * 13. ula -> intbus2 // ula.internalRead(1)
+	 * 14. pc <- intbus2 // pc.internalStore() now pc points to the second parameter (the reg id)
+	 * 15. pc -> extbus // pc.read()
+	 * 16. memory reads from extbus // the register id is now in extbus
+	 * 17. demux <- extbus // demux.setValue(extbus1.get()) points to the correct register
+	 * 18. registers -> intbus2 // registersInternalRead() performs internal store for the register identified in demux bus
+	 * 19. ula <- intbus2 // ula.internalStore(1)
+	 * 20. ir -> intbus2 // ir.internalRead()
+	 * 21. ula <- intbus2 // ula.internalStore(0)
+	 * 22. ula adds // ula.add()
+	 * 23. ula -> intbus2 // ula.internalRead(1)
+	 * 24. changeFlags // setStatusFlags(intbus2.get()) changing flags due to the end of the operation
+	 * 25. registers <- intbus2 // registersInternalStore()
+	 * 26. pc -> intbus2 // pc.internalRead()
+	 * 27. ula <- intbus2 // ula.internalStore(1)
+	 * 28. ula incs // ula.inc()
+	 * 29. ula -> intbus2 // ula.internalRead(1)
+	 * 30. pc <- intbus2 // pc.internalStore() now pc points to the next instruction
+	 * end
+	 */
+	
+	public void addIMM() {
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		memory.read();
+		IR.store();
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.internalStore(1);
+		IR.internalRead();
+		ula.internalStore(0);
+		ula.add();
+		ula.internalRead(1);
+		setStatusFlags(intbus2.get());
+		registersInternalStore();
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
+
+	
+	
 
 	
 

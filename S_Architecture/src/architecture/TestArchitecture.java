@@ -185,6 +185,42 @@ public class TestArchitecture {
 		assertEquals(0, arch.getFlags().getBit(1));
 	}
 	
+	@Test
+	public void testAddIMM() {
+		Architecture arch = new Architecture();
+		
+		
+		//storing the number 40 in the memory, in position 11
+		arch.getMemory().getDataList()[11]=5;
+		//storing the number 0 in the memory, in position 12
+		arch.getMemory().getDataList()[12]=0;
+
+		//making PC points to position 10
+		arch.getExtbus1().put(10);
+		arch.getPC().store();
+		
+		
+		//now setting the REG0 values
+		arch.getIntbus1().put(10);
+		arch.getRegistersList().get(0).store(); //RPG0 has 10
+		
+		//executing the command move REG0.
+		arch.addIMM();
+		
+		//testing if REG0 stores 15:
+		arch.getRegistersList().get(0).read();
+		assertEquals(15, arch.getIntbus1().get());
+
+			
+		//Testing if PC points to 3 positions after the original
+		//PC was pointing to 10; now it must be pointing to 13
+		arch.getPC().read();assertEquals(13, arch.getExtbus1().get());
+		
+		//the flags bits 0 and 1 must be 0
+		assertEquals(0, arch.getFlags().getBit(0));
+		assertEquals(0, arch.getFlags().getBit(1));
+	}
+	
 	
 	
 	@Test
