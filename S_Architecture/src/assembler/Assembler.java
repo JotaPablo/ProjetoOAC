@@ -145,41 +145,55 @@ public class Assembler {
 		String parameter ="";
 		String parameter2 = "";
 		int commandNumber = findCommandNumber(tokens);
-		if (commandNumber == 0) { //must to proccess an add command
+		if (commandNumber == 0) { //must to proccess an add Reg Reg command
 			parameter = tokens[1];
-			parameter = "&"+parameter; //this is a flag to indicate that is a position in memory
+			parameter2 = tokens[2];
 		}
-		if (commandNumber == 1) { //must to proccess an sub command
+		if (commandNumber == 1) { //must to proccess an add Mem Reg command
+			parameter = tokens[1];
+			parameter = "&" + parameter;
+			parameter2 = tokens[2];
+		}
+		if (commandNumber == 2) { //must to proccess an add Reg Mem command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter2 = "&" + parameter2;
+		}
+		if (commandNumber == 3) { //must to proccess an add Imm Reg command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+		}
+		if (commandNumber == 4) { //must to proccess an sub command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory		
 		}
-		if (commandNumber == 2) { //must to proccess an jmp command
+		if (commandNumber == 5) { //must to proccess an jmp command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 3) { //must to proccess an jz command
+		if (commandNumber == 6) { //must to proccess an jz command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 4) { //must to proccess an jn command
+		if (commandNumber == 7) { //must to proccess an jn command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 5) { //must to proccess an read command
+		if (commandNumber == 8) { //must to proccess an read command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 6) { //must to proccess an store command
+		if (commandNumber == 9) { //must to proccess an store command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 7) { //must to proccess an ldi command
+		if (commandNumber == 10) { //must to proccess an ldi command
 			parameter = tokens[1];
 		}
-		if (commandNumber == 8) { //must to proccess an inc command
+		if (commandNumber == 11) { //must to proccess an inc command
 			
 		}
-		if (commandNumber == 9) { //must to proccess an moveRegReg command
+		if (commandNumber == 12) { //must to proccess an moveRegReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
@@ -206,6 +220,8 @@ public class Assembler {
 		if (p<0){ //the command isn't in the list. So it must have multiple formats
 			if ("move".equals(tokens[0])) //the command is a move
 				p = proccessMove(tokens);
+			else if ("add".equals(tokens[0]))
+				p = processAdd(tokens);
 		}
 		return p;
 	}
@@ -225,6 +241,36 @@ public class Assembler {
 		}
 		return p;
 	}
+	
+	/**
+	 * Esse metodo processa o comando Add
+	 * Possui diferentes formatos, o que significa diferentes tipos de comandos internos
+	 * @param tokens
+	 * @return
+	 */
+	private int processAdd(String[] tokens) {
+		String p1 = tokens[1];
+		String p2 = tokens[2];
+		int p=-1;
+		
+		if (tokens.length != 3) {
+	        return -1; // Indica comando inválido
+	    }
+		if((p1.startsWith("%"))&&(p2.startsWith("%"))) { //Deve ser o comando addRegReg
+			p = commands.indexOf("addRegReg");
+		}
+		else if((p1.startsWith("%"))) { //Deve ser o comando addRegMem
+			p = commands.indexOf("addRegMem");
+		}
+		else if(p1.matches("-?\\d+") && p2.startsWith("%")){	//Deve ser o comando addIMM
+			p = commands.indexOf("addImmReg");
+		}
+		else if((p2.startsWith("%"))) { //Deve ser o comando addMemReg
+			p = commands.indexOf("addMemReg");
+		}
+		return p;
+	}
+	
 
 	/**
 	 * This method creates the executable program from the object program

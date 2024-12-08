@@ -60,207 +60,163 @@ public class TestArchitecture {
 	
 	@Test
 	public void testAddRegReg() {
-		Architecture arch = new Architecture();
-		
+	    Architecture arch = new Architecture();
 
-		//storing the number 0 in the memory, in position 31
-		arch.getMemory().getDataList()[31]=0;
-		//storing the number 1 in the memory, in position 32
-		arch.getMemory().getDataList()[32]=1;
-		
+	    // armazenando o número 0 na memória, na posição 31
+	    arch.getMemory().getDataList()[31] = 0;
+	    // armazenando o número 1 na memória, na posição 32
+	    arch.getMemory().getDataList()[32] = 1;
 
-		//making PC points to position 30
-		arch.getExtbus1().put(30);
-		arch.getPC().store();
-		
-		
-		//now setting the registers values
-		arch.getIntbus1().put(1);
-		arch.getRegistersList().get(0).store(); //RPG0 has 1
-		arch.getIntbus1().put(2);
-		arch.getRegistersList().get(1).store(); //RPG1 has 2
-		
-		//executing the command move REG1 REG0.
-		arch.addRegReg();
-		
-		//testing if both REG1 store 3 and REG0 stores 1:
-		arch.getRegistersList().get(0).read();
-		assertEquals(1, arch.getIntbus1().get());
-		arch.getRegistersList().get(1).read();
-		assertEquals(3, arch.getIntbus1().get());
-		
-		//Testing if PC points to 3 positions after the original
-		//PC was pointing to 30; now it must be pointing to 33
-		arch.getPC().read();assertEquals(33, arch.getExtbus1().get());
-		
-		//the flags bits 0 and 1 must be 0
-		assertEquals(0, arch.getFlags().getBit(0));
-		assertEquals(0, arch.getFlags().getBit(1));
+	    // fazendo o PC apontar para a posição 30
+	    arch.getExtbus1().put(30);
+	    arch.getPC().store();
+
+	    // agora configurando os valores dos registradores
+	    arch.getIntbus1().put(1);
+	    arch.getRegistersList().get(0).store(); // RPG0 tem 1
+	    arch.getIntbus1().put(2);
+	    arch.getRegistersList().get(1).store(); // RPG1 tem 2
+
+	    // executando o comando move REG1 REG0.
+	    arch.addRegReg();
+
+	    // testando se o REG1 armazena 3 e o REG0 armazena 1:
+	    arch.getRegistersList().get(0).read();
+	    assertEquals(1, arch.getIntbus1().get());
+	    arch.getRegistersList().get(1).read();
+	    assertEquals(3, arch.getIntbus1().get());
+
+	    // testando se o PC aponta para 3 posições após a original
+	    // o PC estava apontando para 30; agora deve apontar para 33
+	    arch.getPC().read();
+	    assertEquals(33, arch.getExtbus1().get());
+
+	    // os bits de flag 0 e 1 devem ser 0
+	    assertEquals(0, arch.getFlags().getBit(0));
+	    assertEquals(0, arch.getFlags().getBit(1));
 	}
-	
+
 	@Test
 	public void testAddMemReg() {
-		Architecture arch = new Architecture();
-		
+	    Architecture arch = new Architecture();
 
-		//storing the number 5 in the memory, in position 40
-		arch.getMemory().getDataList()[40]= 5;
-		
-		//storing the number 40 in the memory, in position 11
-		arch.getMemory().getDataList()[11]=40;
-		//storing the number 0 in the memory, in position 12
-		arch.getMemory().getDataList()[12]=0;
+	    // armazenando o número 5 na memória, na posição 40
+	    arch.getMemory().getDataList()[40] = 5;
 
-		//making PC points to position 10
-		arch.getExtbus1().put(10);
-		arch.getPC().store();
-		
-		
-		//now setting the REG0 values
-		arch.getIntbus1().put(10);
-		arch.getRegistersList().get(0).store(); //RPG0 has 10
-		
-		//executing the command move REG0.
-		arch.addMemReg();
-		
-		//testing if REG0 stores 15:
-		arch.getRegistersList().get(0).read();
-		assertEquals(15, arch.getIntbus1().get());
-		
-		//testing if mem[40] stores 5
-		arch.getExtbus1().put(40);
-		arch.getMemory().read();
-		assertEquals(5, arch.getExtbus1().get());
-			
-		//Testing if PC points to 3 positions after the original
-		//PC was pointing to 10; now it must be pointing to 13
-		arch.getPC().read();assertEquals(13, arch.getExtbus1().get());
-		
-		//the flags bits 0 and 1 must be 0
-		assertEquals(0, arch.getFlags().getBit(0));
-		assertEquals(0, arch.getFlags().getBit(1));
+	    // armazenando o número 40 na memória, na posição 11
+	    arch.getMemory().getDataList()[11] = 40;
+	    // armazenando o número 0 na memória, na posição 12
+	    arch.getMemory().getDataList()[12] = 0;
+
+	    // fazendo o PC apontar para a posição 10
+	    arch.getExtbus1().put(10);
+	    arch.getPC().store();
+
+	    // agora configurando os valores do REG0
+	    arch.getIntbus1().put(10);
+	    arch.getRegistersList().get(0).store(); // RPG0 tem 10
+
+	    // executando o comando move REG0.
+	    arch.addMemReg();
+
+	    // testando se REG0 armazena 15:
+	    arch.getRegistersList().get(0).read();
+	    assertEquals(15, arch.getIntbus1().get());
+
+	    // testando se mem[40] armazena 5
+	    arch.getExtbus1().put(40);
+	    arch.getMemory().read();
+	    assertEquals(5, arch.getExtbus1().get());
+
+	    // testando se o PC aponta para 3 posições após a original
+	    // o PC estava apontando para 10; agora deve apontar para 13
+	    arch.getPC().read();
+	    assertEquals(13, arch.getExtbus1().get());
+
+	    // os bits de flag 0 e 1 devem ser 0
+	    assertEquals(0, arch.getFlags().getBit(0));
+	    assertEquals(0, arch.getFlags().getBit(1));
 	}
-	
+
 	@Test
 	public void testAddRegMem() {
-		Architecture arch = new Architecture();
-		
+	    Architecture arch = new Architecture();
 
-		//storing the number 5 in the memory, in position 40
-		arch.getMemory().getDataList()[40]= 5;
-		
-		//storing the number 0 in the memory, in position 11
-		arch.getMemory().getDataList()[11]=0;
-		//storing the number 40 in the memory, in position 12
-		arch.getMemory().getDataList()[12]=40;
+	    // armazenando o número 5 na memória, na posição 40
+	    arch.getMemory().getDataList()[40] = 5;
 
-		//making PC points to position 10
-		arch.getExtbus1().put(10);
-		arch.getPC().store();
-		
-		
-		//now setting the REG0 values
-		arch.getIntbus1().put(10);
-		arch.getRegistersList().get(0).store(); //RPG0 has 1
-		
-		//executing the command move REG0.
-		arch.addRegMem();
-		
-		//testing if REG0 stores 10:
-		arch.getRegistersList().get(0).read();
-		assertEquals(10, arch.getIntbus1().get());
-		
-		//testing if mem[40] stores 15
-		arch.getExtbus1().put(40);
-		arch.getMemory().read();
-		assertEquals(15, arch.getExtbus1().get());
+	    // armazenando o número 0 na memória, na posição 11
+	    arch.getMemory().getDataList()[11] = 0;
+	    // armazenando o número 40 na memória, na posição 12
+	    arch.getMemory().getDataList()[12] = 40;
 
-		
-		//Testing if PC points to 3 positions after the original
-		//PC was pointing to 10; now it must be pointing to 13
-		arch.getPC().read();assertEquals(13, arch.getExtbus1().get());
-		
-		//the flags bits 0 and 1 must be 0
-		assertEquals(0, arch.getFlags().getBit(0));
-		assertEquals(0, arch.getFlags().getBit(1));
+	    // fazendo o PC apontar para a posição 10
+	    arch.getExtbus1().put(10);
+	    arch.getPC().store();
+
+	    // agora configurando os valores do REG0
+	    arch.getIntbus1().put(10);
+	    arch.getRegistersList().get(0).store(); // RPG0 tem 1
+
+	    // executando o comando move REG0.
+	    arch.addRegMem();
+
+	    // testando se REG0 armazena 10:
+	    arch.getRegistersList().get(0).read();
+	    assertEquals(10, arch.getIntbus1().get());
+
+	    // testando se mem[40] armazena 15
+	    arch.getExtbus1().put(40);
+	    arch.getMemory().read();
+	    assertEquals(15, arch.getExtbus1().get());
+
+	    // testando se o PC aponta para 3 posições após a original
+	    // o PC estava apontando para 10; agora deve apontar para 13
+	    arch.getPC().read();
+	    assertEquals(13, arch.getExtbus1().get());
+
+	    // os bits de flag 0 e 1 devem ser 0
+	    assertEquals(0, arch.getFlags().getBit(0));
+	    assertEquals(0, arch.getFlags().getBit(1));
 	}
-	
+
 	@Test
-	public void testAddIMM() {
-		Architecture arch = new Architecture();
-		
-		
-		//storing the number 40 in the memory, in position 11
-		arch.getMemory().getDataList()[11]=5;
-		//storing the number 0 in the memory, in position 12
-		arch.getMemory().getDataList()[12]=0;
+	public void testAddImmReg() {
+	    Architecture arch = new Architecture();
 
-		//making PC points to position 10
-		arch.getExtbus1().put(10);
-		arch.getPC().store();
-		
-		
-		//now setting the REG0 values
-		arch.getIntbus1().put(10);
-		arch.getRegistersList().get(0).store(); //RPG0 has 10
-		
-		//executing the command move REG0.
-		arch.addIMM();
-		
-		//testing if REG0 stores 15:
-		arch.getRegistersList().get(0).read();
-		assertEquals(15, arch.getIntbus1().get());
+	    // armazenando o número 40 na memória, na posição 11
+	    arch.getMemory().getDataList()[11] = 5;
+	    // armazenando o número 0 na memória, na posição 12
+	    arch.getMemory().getDataList()[12] = 0;
 
-			
-		//Testing if PC points to 3 positions after the original
-		//PC was pointing to 10; now it must be pointing to 13
-		arch.getPC().read();assertEquals(13, arch.getExtbus1().get());
-		
-		//the flags bits 0 and 1 must be 0
-		assertEquals(0, arch.getFlags().getBit(0));
-		assertEquals(0, arch.getFlags().getBit(1));
+	    // fazendo o PC apontar para a posição 10
+	    arch.getExtbus1().put(10);
+	    arch.getPC().store();
+
+	    // agora configurando os valores do REG0
+	    arch.getIntbus1().put(10);
+	    arch.getRegistersList().get(0).store(); // RPG0 tem 10
+
+	    // executando o comando move REG0.
+	    arch.addImmReg();
+
+	    // testando se REG0 armazena 15:
+	    arch.getRegistersList().get(0).read();
+	    assertEquals(15, arch.getIntbus1().get());
+
+	    // testando se o PC aponta para 3 posições após a original
+	    // o PC estava apontando para 10; agora deve apontar para 13
+	    arch.getPC().read();
+	    assertEquals(13, arch.getExtbus1().get());
+
+	    // os bits de flag 0 e 1 devem ser 0
+	    assertEquals(0, arch.getFlags().getBit(0));
+	    assertEquals(0, arch.getFlags().getBit(1));
 	}
-	
-	
-	
-	@Test
-	public void testAdd() {
-		Architecture arch = new Architecture();
-		//storing the number 5 in position 40
-		arch.getExtbus1().put(40);
-		arch.getMemory().store();
-		arch.getExtbus1().put(5);
-		arch.getMemory().store();
-		
-		//moreover, the number 40 must be in the position next to PC. (to perform add 40)
-		//in this test, PC will point to 10 and the 40 will be in the position 11
-		arch.getExtbus1().put(11);
-		arch.getMemory().store();
-		arch.getExtbus1().put(40); //40 is in position 11
-		arch.getMemory().store();
-		arch.getExtbus1().put(10);
-		arch.getPC().store();      //PC points to position 10
-		
-		//storing the number 8 in the RPG
-		arch.getExtbus1().put(8);
-		arch.getRPG().store();
-		//now we can perform the add method. 
-		//we will add the number 5 (stored in the 40th position in the memory) 
-		//with the number 8 (already stored in the rgp)
-		//result must be into rpg
-		//pc must be two positions ahead the original one
-		arch.add();
-		arch.getRPG().read();
-		//the bus must contains the number 13
-		assertEquals(13, arch.getExtbus1().get());
-		//the flags bits 0 and 1 must be 0
-		assertEquals(0, arch.getFlags().getBit(0));
-		assertEquals(0, arch.getFlags().getBit(1));
-		//PC must be pointing to 12
-		arch.getPC().read();
-		assertEquals(12, arch.getExtbus1().get());
 
-	}
+	
+	
+
 	
 	@Test
 	public void testSub() {
@@ -718,35 +674,41 @@ public class TestArchitecture {
 	@Test
 	public void testFillCommandsList() {
 		
-		//all the instructions must be in Commands List
+		// Todas as intruções devem estar na CommandList
+		// Tabela de instruções, com base nos microprogramas especificados
 		/*
-		 *
-				add addr (rpg <- rpg + addr)
-				sub addr (rpg <- rpg - addr)
-				jmp addr (pc <- addr)
-				jz addr  (se bitZero pc <- addr)
-				jn addr  (se bitneg pc <- addr)
-				read addr (rpg <- addr)
-				store addr  (addr <- rpg)
-				ldi x    (rpg <- x. x must be an integer)
-				inc    (rpg++)
-				move %reg0 %reg1 (reg1 <- Reg0)
+		 * add %<regA> %<regB>        -> RegB <- RegA + RegB
+		 * add <addr> %<regA>         -> rpg <- rpg + addr
+		 * add %<regA> <addr>         -> addr <- rpg + regA
+		 * add <imm> %<regA>          -> rpg <- regA + imm
+		 * sub <addr>                 -> rpg <- rpg - addr
+		 * jmp <addr>                 -> pc <- addr
+		 * jz <addr>                  -> se bitZero, pc <- addr
+		 * jn <addr>                  -> se bitneg, pc <- addr
+		 * read <addr>                -> rpg <- addr
+		 * store <addr>               -> addr <- rpg
+		 * ldi <x>                    -> rpg <- x
+		 * inc                        -> rpg++
+		 * move %<regA> %<regB>       -> regA <- regB
 		 */
 
 		
-		
 		Architecture arch = new Architecture();
 		ArrayList<String> commands = arch.getCommandsList();
-		assertTrue("add".equals(commands.get(0)));
-		assertTrue("sub".equals(commands.get(1)));
-		assertTrue("jmp".equals(commands.get(2)));
-		assertTrue("jz".equals(commands.get(3)));
-		assertTrue("jn".equals(commands.get(4)));
-		assertTrue("read".equals(commands.get(5)));
-		assertTrue("store".equals(commands.get(6)));
-		assertTrue("ldi".equals(commands.get(7)));
-		assertTrue("inc".equals(commands.get(8)));
-		assertTrue("moveRegReg".equals(commands.get(9)));
+
+		assertTrue("addRegReg".equals(commands.get(0)));  // 0
+		assertTrue("addMemReg".equals(commands.get(1)));  // 1
+		assertTrue("addRegMem".equals(commands.get(2)));  // 2
+		assertTrue("addImmReg".equals(commands.get(3)));  // 3
+		assertTrue("sub".equals(commands.get(4)));        // 4
+		assertTrue("jmp".equals(commands.get(5)));        // 5
+		assertTrue("jz".equals(commands.get(6)));         // 6
+		assertTrue("jn".equals(commands.get(7)));         // 7
+		assertTrue("read".equals(commands.get(8)));       // 8
+		assertTrue("store".equals(commands.get(9)));      // 9
+		assertTrue("ldi".equals(commands.get(10)));       // 10
+		assertTrue("inc".equals(commands.get(11)));       // 11
+		assertTrue("moveRegReg".equals(commands.get(12))); // 12
 	}
 	
 	@Test
