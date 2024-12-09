@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
 import components.Bus;
 import components.Demux;
 import components.Memory;
@@ -182,15 +181,18 @@ public class Architecture {
 		commandsList.add("addMemReg"); //1
 		commandsList.add("addRegMem"); //2
 		commandsList.add("addImmReg"); //3
-		commandsList.add("sub");   //4
-		commandsList.add("jmp");   //5
-		commandsList.add("jz");    //6
-		commandsList.add("jn");    //7
-		commandsList.add("read");  //8
-		commandsList.add("store"); //9
-		commandsList.add("ldi");   //10
-		commandsList.add("inc");   //11	
-		commandsList.add("moveRegReg"); //12
+		commandsList.add("subRegReg"); //4
+		commandsList.add("subMemReg"); //5
+		commandsList.add("subRegMem"); //6
+		commandsList.add("subImmReg"); //7
+		commandsList.add("jmp");   //8
+		commandsList.add("jz");    //9
+		commandsList.add("jn");    //10
+		commandsList.add("read");  //11
+		commandsList.add("store"); //12
+		commandsList.add("ldi");   //13
+		commandsList.add("inc");   //14	
+		commandsList.add("moveRegReg"); //15
 	}
 
 	
@@ -558,6 +560,146 @@ public class Architecture {
 	 * end
 	 * @param address
 	 */
+	
+	public void subRegReg() {
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore(); // agora o PC aponta para o primeiro parâmetro (o primeiro reg ID)
+	    PC.read();
+	    memory.read(); // o primeiro ID de registrador está agora no barramento externo.
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore(); // agora o PC aponta para o segundo parâmetro (o segundo reg ID)
+	    demux.setValue(extbus1.get()); // aponta para o registrador correto
+	    registersInternalRead(); // começa a leitura do registrador identificado no barramento demux
+	    ula.internalStore(0);
+	    PC.read();
+	    memory.read(); // o segundo ID de registrador está agora no barramento externo.
+	    demux.setValue(extbus1.get()); // aponta para o registrador correto
+	    registersInternalRead(); // realiza uma leitura interna do registrador identificado no barramento demux
+	    ula.internalStore(1);
+	    ula.sub();
+	    ula.internalRead(1);
+	    setStatusFlags(intbus2.get()); // altera os flags devido ao fim da operação
+	    registersInternalStore();
+	    PC.internalRead(); // precisamos fazer com que o PC aponte para o próximo endereço de instrução
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore(); // agora o PC aponta para a próxima instrução. Voltamos para o estado FETCH.
+	}
+	
+	
+
+	 
+	public void subMemReg() {
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    memory.read();
+	    IR.store();
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.internalStore(1);
+	    IR.internalRead();
+	    ula.internalStore(0);
+	    ula.sub();
+	    ula.internalRead(1);
+	    setStatusFlags(intbus2.get());
+	    registersInternalStore();
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
+
+
+	public void subRegMem() {
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    memory.read();
+	    IR.store();
+	    IR.internalRead();
+	    ula.internalStore(1);
+	    registersInternalRead();
+	    ula.internalStore(0);
+	    ula.sub();
+	    ula.internalRead(1);
+	    setStatusFlags(intbus2.get());
+	    IR.internalStore();
+	    PC.read();
+	    memory.read();
+	    memory.store();
+	    IR.read();
+	    memory.store();
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
+
+
+	public void subImmReg() {
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    IR.store();
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	    PC.read();
+	    memory.read();
+	    demux.setValue(extbus1.get());
+	    registersInternalRead();
+	    ula.internalStore(1);
+	    IR.internalRead();
+	    ula.internalStore(0);
+	    ula.sub();
+	    ula.internalRead(1);
+	    setStatusFlags(intbus2.get());
+	    registersInternalStore();
+	    PC.internalRead();
+	    ula.internalStore(1);
+	    ula.inc();
+	    ula.internalRead(1);
+	    PC.internalStore();
+	}
 	public void sub() {
 		PC.internalRead();
 		ula.internalStore(1);
@@ -1044,30 +1186,39 @@ public class Architecture {
 			addImmReg();
 			break;
 		case 4:
-			sub();
+			subRegReg();
 			break;
 		case 5:
-			jmp();
+			subMemReg();
 			break;
 		case 6:
-			jz();
+			subRegMem();
 			break;
 		case 7:
-			jn();
+			subImmReg();
 			break;
 		case 8:
-			read();
+			jmp();
 			break;
 		case 9:
-			store();
+			jz();
 			break;
 		case 10:
-			ldi();
+			jn();
 			break;
 		case 11:
-			inc();
+			read();
 			break;
 		case 12:
+			store();
+			break;
+		case 13:
+			ldi();
+			break;
+		case 14:
+			inc();
+			break;
+		case 15:
 			moveRegReg();
 			break;
 		default:

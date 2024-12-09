@@ -163,37 +163,51 @@ public class Assembler {
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
-		if (commandNumber == 4) { //must to proccess an sub command
+		if (commandNumber == 4) { //must to proccess an sub Reg Reg command
 			parameter = tokens[1];
-			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory		
+			parameter2 = tokens[2];
 		}
-		if (commandNumber == 5) { //must to proccess an jmp command
+		if (commandNumber == 5) { //must to proccess an sub Mem Reg command
 			parameter = tokens[1];
-			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+			parameter = "&" + parameter;
+			parameter2 = tokens[2];
 		}
-		if (commandNumber == 6) { //must to proccess an jz command
+		if (commandNumber == 6) { //must to proccess an sub Reg Mem command
 			parameter = tokens[1];
-			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+			parameter2 = tokens[2];
+			parameter2 = "&" + parameter2;
 		}
-		if (commandNumber == 7) { //must to proccess an jn command
+		if (commandNumber == 7) { //must to proccess an sub Imm Reg command
 			parameter = tokens[1];
-			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+			parameter2 = tokens[2];
 		}
-		if (commandNumber == 8) { //must to proccess an read command
-			parameter = tokens[1];
-			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
-		}
-		if (commandNumber == 9) { //must to proccess an store command
+		if (commandNumber == 8) { //must to proccess an jmp command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 10) { //must to proccess an ldi command
+		if (commandNumber == 9) { //must to proccess an jz command
+			parameter = tokens[1];
+			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 10) { //must to proccess an jn command
+			parameter = tokens[1];
+			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 11) { //must to proccess an read command
+			parameter = tokens[1];
+			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 12) { //must to proccess an store command
+			parameter = tokens[1];
+			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 13) { //must to proccess an ldi command
 			parameter = tokens[1];
 		}
-		if (commandNumber == 11) { //must to proccess an inc command
+		if (commandNumber == 14) { //must to proccess an inc command
 			
 		}
-		if (commandNumber == 12) { //must to proccess an moveRegReg command
+		if (commandNumber == 15) { //must to proccess an moveRegReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
@@ -222,6 +236,8 @@ public class Assembler {
 				p = proccessMove(tokens);
 			else if ("add".equals(tokens[0]))
 				p = processAdd(tokens);
+			else if ("sub".equals(tokens[0]))
+				p = processSub(tokens);
 		}
 		return p;
 	}
@@ -267,6 +283,29 @@ public class Assembler {
 		}
 		else if((p2.startsWith("%"))) { //Deve ser o comando addMemReg
 			p = commands.indexOf("addMemReg");
+		}
+		return p;
+	}
+	
+	private int processSub(String[] tokens) {
+		String p1 = tokens[1];
+		String p2 = tokens[2];
+		int p=-1;
+		
+		if (tokens.length != 3) {
+	        return -1; // Indica comando inválido
+	    }
+		if((p1.startsWith("%"))&&(p2.startsWith("%"))) { //Deve ser o comando subRegReg
+			p = commands.indexOf("subRegReg");
+		}
+		else if((p1.startsWith("%"))) { //Deve ser o comando subRegMem
+			p = commands.indexOf("subRegMem");
+		}
+		else if(p1.matches("-?\\d+") && p2.startsWith("%")){	//Deve ser o comando subIMM
+			p = commands.indexOf("subImmReg");
+		}
+		else if((p2.startsWith("%"))) { //Deve ser o comando subMemReg
+			p = commands.indexOf("subMemReg");
 		}
 		return p;
 	}
