@@ -163,9 +163,10 @@ public class Architecture {
 	 * add %<regA> <addr>         -> addr <- rpg + regA
 	 * add <imm> %<regA>          -> rpg <- regA + imm, imm precisa ser um inteiro 
 	 * sub <addr>                 -> rpg <- rpg - addr
-	 * jmp <addr>                 -> pc <- addr
-	 * jz <addr>                  -> se bitZero, pc <- addr
-	 * jn <addr>                  -> se bitneg, pc <- addr
+	 * jmp <mem>                 -> pc <- mem
+	 * jn <mem>                  -> se bitneg, pc <- mem
+     * jz <mem>                  -> se bitZero, pc <- mem
+     * jeq %<regA> %<regB>       -> se regA == regB, pc <- mem
 	 * read <addr>                -> rpg <- addr
 	 * store <addr>               -> addr <- rpg
 	 * ldi <x>                    -> rpg <- x
@@ -184,13 +185,14 @@ public class Architecture {
 		commandsList.add("addImmReg"); //3
 		commandsList.add("sub");   //4
 		commandsList.add("jmp");   //5
-		commandsList.add("jz");    //6
-		commandsList.add("jn");    //7
-		commandsList.add("read");  //8
-		commandsList.add("store"); //9
-		commandsList.add("ldi");   //10
-		commandsList.add("inc");   //11	
-		commandsList.add("moveRegReg"); //12
+		commandsList.add("jn");    //6
+        commandsList.add("jz");    //7
+		commandsList.add("jeq");   //8
+		commandsList.add("read");  //9
+		commandsList.add("store"); //10
+		commandsList.add("ldi");   //11
+		commandsList.add("inc");   //12	
+		commandsList.add("moveRegReg"); //13
 	}
 
 	
@@ -586,7 +588,7 @@ public class Architecture {
 	
 	/**
 	 * This method implements the microprogram for
-	 * 					JMP address
+	 * 					JMP Address
 	 * In the machine language this command number is 2, and the address is in the position next to him
 	 *    
 	 * where address is a valid position in this memory architecture (where the PC is redirecto to)
@@ -613,7 +615,9 @@ public class Architecture {
 		PC.internalStore(); //now PC points to the parameter address
 		PC.read();
 		memory.read();
-		PC.store();
+        IR.read();
+        IR.internalRead();
+		PC.internalStore();
 	}
 	
 	/**
