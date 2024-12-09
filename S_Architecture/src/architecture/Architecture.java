@@ -652,21 +652,27 @@ public class Architecture {
 	 */
 	public void jz() {
 		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();//now PC points to the parameter address
-		PC.read();
-		memory.read();// now the parameter value (address of the jz) is in the external bus
-		statusMemory.storeIn1(); //the address is in position 1 of the status memory
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();//now PC points to the next instruction
-		PC.read();//now the bus has the next istruction address
-		statusMemory.storeIn0(); //the address is in the position 0 of the status memory
-		extbus1.put(Flags.getBit(0)); //the ZERO bit is in the external bus 
-		statusMemory.read(); //gets the correct address (next instruction or parameter address)
-		PC.store(); //stores into PC
+        ula.internalStore(1);
+        ula.inc();
+        ula.internalRead(1);
+        PC.internalStore();
+        PC.read();
+        memory.read();
+        IR.store();
+        Flags.internalRead();
+        if (Flags.getBit(0) == 1) {
+        // Salta: PC = <mem>
+            IR.internalRead(); // intbus2 = <mem>
+            PC.internalStore(); // PC = <mem>
+        } else {
+            // Não salta: incrementa PC
+            PC.internalRead();
+            ula.internalStore(1);
+            ula.inc();
+            ula.internalRead(1);
+            PC.internalStore();
+        }
+        
 	}
 	
 	/**
@@ -700,24 +706,29 @@ public class Architecture {
 	 * @param address
 	 */
 	public void jn() {
-		PC.internalRead();
-		ula.internalStore(1);
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();//now PC points to the parameter address
-		PC.read();
-		memory.read();// now the parameter value (address of the jz) is in the external bus
-		statusMemory.storeIn1(); //the address is in position 1 of the status memory
-		ula.inc();
-		ula.internalRead(1);
-		PC.internalStore();//now PC points to the next instruction
-		PC.read();//now the bus has the next istruction address
-		statusMemory.storeIn0(); //the address is in the position 0 of the status memory
-		extbus1.put(Flags.getBit(1)); //the ZERO bit is in the external bus 
-		statusMemory.read(); //gets the correct address (next instruction or parameter address)
-		PC.store(); //stores into PC
+        PC.internalRead();
+        ula.internalStore(1);
+        ula.inc();
+        ula.internalRead(1);
+        PC.internalStore();
+        PC.read();
+        memory.read();
+        IR.store();
+        Flags.internalRead();
+        if (Flags.getBit(1) == 1) {
+        // Salta: PC = <mem>
+            IR.internalRead(); // intbus2 = <mem>
+            PC.internalStore(); // PC = <mem>
+        } else {
+            // Não salta: incrementa PC
+            PC.internalRead();
+            ula.internalStore(1);
+            ula.inc();
+            ula.internalRead(1);
+            PC.internalStore();
+        }
 	}
-	
+
 	/**
 	 * This method implements the microprogram for
 	 * 					read address
