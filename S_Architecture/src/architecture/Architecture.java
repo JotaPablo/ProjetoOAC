@@ -189,7 +189,7 @@ public class Architecture {
 		commandsList.add("jmp");   //8
 		commandsList.add("jn");    //9
 		commandsList.add("jz");    //10
-                commandsList.add("jeq");   //11
+        commandsList.add("jeq");   //11
 		commandsList.add("read");  //12
 		commandsList.add("store"); //13
 		commandsList.add("ldi");   //14

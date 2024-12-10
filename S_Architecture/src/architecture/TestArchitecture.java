@@ -533,8 +533,60 @@ public class TestArchitecture {
 	
      @Test
      public void testeJeq(){
-        //
+        Architecture arch = new Architecture();
+        //storing the number 1 in the memory, in position 11
+		arch.getMemory().getDataList()[11]=0;
+		//storing the number 0 in the memory, in position 12
+		arch.getMemory().getDataList()[12]=1;
+		//making PC points to position 10
+        //storing the number 10 in PC
+		arch.getIntbus2().put(10);
+		arch.getPC().internalStore();
 		
+		
+        //storing the number 15 in the into the memory, in position 11, the position just after PC
+		arch.getExtbus1().put(13);
+		arch.getMemory().store();
+		arch.getExtbus1().put(15);
+		arch.getMemory().store();
+		
+		arch.getExtbus1().put(15);
+		arch.getMemory().store();
+		arch.getExtbus1().put(17);
+		arch.getMemory().store();
+        
+        // caso não igual
+
+         //now setting the registers values
+		arch.getIntbus1().put(45);
+		arch.getRegistersList().get(0).store(); //RPG0 has 45
+		arch.getIntbus1().put(99);
+		arch.getRegistersList().get(1).store(); //RPG1 has 99
+        //testing if PC stores the number 10
+		arch.getPC().read();
+		assertEquals(10, arch.getExtbus1().get());
+        arch.jeq();
+            
+        //PC must be storng the number 14
+		arch.getPC().internalRead();
+		assertEquals(14, arch.getIntbus2().get());
+
+        // caso igual
+		arch.getIntbus2().put(10);
+		arch.getPC().internalStore();
+		
+        arch.getIntbus1().put(45);
+		arch.getRegistersList().get(0).store(); //RPG0 has 45
+		arch.getRegistersList().get(1).store(); //RPG1 has 45
+
+        arch.getPC().read();
+		assertEquals(10, arch.getExtbus1().get());
+        arch.jeq();
+        
+        //PC must be storng the number 17
+		arch.getPC().internalRead();
+		assertEquals(17, arch.getIntbus2().get());
+
      }
 
 
