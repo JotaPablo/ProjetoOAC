@@ -370,9 +370,170 @@ public class TestArchitecture {
 	    assertEquals(0, arch.getFlags().getBit(0));
 	    assertEquals(1, arch.getFlags().getBit(1));
 	}
+	
+	
+	@Test
+	public void testMoveMemReg() {
+		Architecture arch = new Architecture();
 
+		// Armazenando o número 1 na memória, na posição 31
+		arch.getMemory().getDataList()[31] = 37;
+		// Armazenando o número 0 na memória, na posição 32
+		arch.getMemory().getDataList()[32] = 0;
+		// Armazenando o número 1 na posição 37 da memória
+		arch.getMemory().getDataList()[37] = 1;
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getIntbus1().put(45);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 45
+		System.out.println(""+arch.getRegistersList().get(0).getData());
+
+		// Executando o comando move mem reg0
+		arch.moveMemReg();
+		System.out.println(""+arch.getRegistersList().get(0).getData());
+
+
+		// Testando se tanto REG0 ta armazenando 1
+		arch.getRegistersList().get(0).read();
+		assertEquals(1, arch.getIntbus1().get());
+
+		// Testando se o PC aponta para 3 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 33
+		arch.getPC().read();
+		assertEquals(33, arch.getExtbus1().get());
+	}
+
+	@Test
+	public void testMoveRegMem() {
+		Architecture arch = new Architecture();
+
+		// Armazenando o número 1 na memória, na posição 31
+		arch.getMemory().getDataList()[31] = 0;
+		// Armazenando o número 0 na memória, na posição 32
+		arch.getMemory().getDataList()[32] = 37;
+		// Armazenando o número 1 na posição 37 da memória
+		arch.getMemory().getDataList()[37] = 15;
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getIntbus1().put(1);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 1
+
+		// Executando o comando move mem reg0
+		arch.moveRegMem();
+
+		// Testando se mem[37] ta armazenando 1
+		arch.getExtbus1().put(37);
+	    arch.getMemory().read();
+	    assertEquals(1, arch.getExtbus1().get());
+
+		// Testando se o PC aponta para 3 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 33
+		arch.getPC().read();
+		assertEquals(33, arch.getExtbus1().get());
+	}
 	
+	@Test
+	public void testMoveRegReg() {
+		Architecture arch = new Architecture();
+
+		// Armazenando na pos31 da memória 1 (regA)
+		arch.getMemory().getDataList()[31] = 1;
+		// Armazenando na pos32 da memória 0 (regB)
+		arch.getMemory().getDataList()[32] = 0;
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getIntbus1().put(30);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 30
+		arch.getIntbus1().put(10);
+		arch.getRegistersList().get(1).store(); // RPG0 possui 10
+
+		// Executando o comando move reg
+		arch.moveRegReg();
+
+		// Testando se tanto reg1 e reg0 ta armazenando 10
+		arch.getRegistersList().get(0).read();
+		assertEquals(10, arch.getIntbus1().get());
+		arch.getRegistersList().get(1).read();
+		assertEquals(10, arch.getIntbus1().get());
+
+		// Testando se o PC aponta para 3 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 33
+		arch.getPC().read();
+		assertEquals(33, arch.getExtbus1().get());
+	}
 	
+	@Test
+	public void testMoveImmReg() {
+		Architecture arch = new Architecture();
+
+		// Armazenando o número 1 na memória, na posição 31
+		arch.getMemory().getDataList()[31] = 1;
+		// Armazenando o número 0 na memória, na posição 32
+		arch.getMemory().getDataList()[32] = 0;
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getIntbus1().put(31);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 31
+
+		// Executando o comando move mem reg0
+		arch.moveImmReg();
+
+		// Testando se mem[37] ta armazenando 1
+		arch.getExtbus1().put(31);
+	    arch.getMemory().read();
+	    assertEquals(1, arch.getExtbus1().get());
+	    
+	    //Testando se REG0 armazena 1:
+	    arch.getRegistersList().get(0).read();
+		assertEquals(1, arch.getIntbus1().get());
+	    
+
+		// Testando se o PC aponta para 3 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 33
+		arch.getPC().read();
+		assertEquals(33, arch.getExtbus1().get());
+	}
+	
+	@Test
+	public void testInc() {
+		
+		Architecture arch = new Architecture();
+
+		// Armazenando na pos31 da memória 0 que e o reg
+		arch.getMemory().getDataList()[31] = 0;
+
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getIntbus1().put(3);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 3
+
+		// Executando o comando move reg
+		arch.inc();
+
+		// Testando se o reg0 incrementou
+		arch.getRegistersList().get(0).read();
+		assertEquals(4, arch.getIntbus1().get());
+
+		// Testando se o PC aponta para 2 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 32
+		arch.getPC().read();
+		assertEquals(32, arch.getExtbus1().get());
+	}
 	
 	@Test
 	public void testJmp() {
@@ -381,10 +542,15 @@ public class TestArchitecture {
 		arch.getIntbus2().put(10);
 		arch.getPC().internalStore();
 
-		//storing the number 25 in the memory, in the position just before that one adressed by PC
+		//storing the number 17 in the memory, in the position just before that one adressed by PC
 		arch.getExtbus1().put(11); //the position is 11, once PC points to 10
 		arch.getMemory().store();
-		arch.getExtbus1().put(25);
+		arch.getExtbus1().put(15);
+		arch.getMemory().store();
+
+        arch.getExtbus1().put(15); //the position is 11, once PC points to 10
+		arch.getMemory().store();
+		arch.getExtbus1().put(17);
 		arch.getMemory().store();
 		
 		
@@ -392,13 +558,13 @@ public class TestArchitecture {
 		arch.getPC().read();
 		assertEquals(10, arch.getExtbus1().get());
 		
-		//now we can perform the jmp method. 
-		//we will move the the number 25 (stored in the 31th position in the memory) 
+		//now we can perform the jmpMem method. 
+		//we will move the the number 17 (stored in the 11th position in the memory) 
 		//into the PC
 		arch.jmp();
 		arch.getPC().internalRead();;
-		//the internalbus2 must contains the number 25
-		assertEquals(25, arch.getIntbus2().get());
+		//the internalbus2 must contains the number 17
+		assertEquals(17, arch.getIntbus2().get());
 
 	}
 	
@@ -406,57 +572,62 @@ public class TestArchitecture {
 	public void testJz() {
 		Architecture arch = new Architecture();
 		
-		//storing the number 30 in PC
-		arch.getIntbus2().put(30);
+		//storing the number 10 in PC
+		arch.getIntbus2().put(10);
 		arch.getPC().internalStore();
 		
-		//storing the number 25 in the into the memory, in position 31, the position just after PC
-		arch.getExtbus1().put(31);
+		//storing the number 17 in the into the memory, in position 11, the position just after PC
+		arch.getExtbus1().put(11);
 		arch.getMemory().store();
-		arch.getExtbus1().put(25);
+		arch.getExtbus1().put(15);
 		arch.getMemory().store();
 
-		//now we can perform the jz method. 
+        arch.getExtbus1().put(15);
+		arch.getMemory().store();
+		arch.getExtbus1().put(17);
+		arch.getMemory().store();
+
+		//now we can perform the jzMem method. 
 
 		//CASE 1.
 		//Bit ZERO is equals to 1
 		arch.getFlags().setBit(0, 1);
 		
-		//So, we will move the the number 25 (stored in the 31th position in the memory) 
+		//So, we will move the the number 17 (stored in the 31th position in the memory) 
 		//into the PC
 
-		//testing if PC stores the number 30
+		//testing if PC stores the number 10
 		arch.getPC().read();
-		assertEquals(30, arch.getExtbus1().get());		
+		assertEquals(10, arch.getExtbus1().get());		
 
 		arch.jz();
 		
-		//PC must be storing the number 25
+		//PC must be storing the number 17
 		arch.getPC().internalRead();
-		assertEquals(25, arch.getIntbus2().get());
+		assertEquals(17, arch.getIntbus2().get());
 		
 		//CASE 2.
 		//Bit ZERO is equals to 0
 		arch.getFlags().setBit(0, 0);
-		//PC must have the number 30 initially (in this time, by using the external bus)
-		arch.getExtbus1().put(30);
+		//PC must have the number 10 initially (in this time, by using the external bus)
+		arch.getExtbus1().put(10);
 		arch.getPC().store();
 		//destroying the data in external bus
 		arch.getExtbus1().put(0);
 
-		//testing if PC stores the number 30
+		//testing if PC stores the number 10
 		arch.getPC().read();
-		assertEquals(30, arch.getExtbus1().get());	
+		assertEquals(10, arch.getExtbus1().get());	
 		
-		//Note that the memory was not changed. So, in position 31 we have the number 25
+		//Note that the memory was not changed. So, in position 11 we have the number 17
 		
-		//Once the ZERO bit is 0, we WILL NOT move the number 25 (stored in the 31th position in the memory)
+		//Once the ZERO bit is 0, we WILL NOT move the number 17 (stored in the 11th position in the memory)
 		//into the PC.
-		//The original PC position was 30. The parameter is in position 31. So, now PC must be pointing to 32
+		//The original PC position was 10. The parameter is in position 11. So, now PC must be pointing to 12
 		arch.jz();
-		//PC contains the number 32
+		//PC contains the number 12
 		arch.getPC().internalRead();
-		assertEquals(32, arch.getIntbus2().get());
+		assertEquals(12, arch.getIntbus2().get());
 	}
 	
 	@Test
@@ -464,242 +635,123 @@ public class TestArchitecture {
 		Architecture arch = new Architecture();
 		
 		//storing the number 30 in PC
-		arch.getIntbus2().put(30);
+		arch.getIntbus2().put(10);
 		arch.getPC().internalStore();
 		
 		//storing the number 25 in the into the memory, in position 31, the position just after PC
-		arch.getExtbus1().put(31);
+		arch.getExtbus1().put(11);
 		arch.getMemory().store();
-		arch.getExtbus1().put(25);
+		arch.getExtbus1().put(15);
+		arch.getMemory().store();
+		
+		arch.getExtbus1().put(15);
+		arch.getMemory().store();
+		arch.getExtbus1().put(17);
 		arch.getMemory().store();
 
-		//now we can perform the jn method. 
+		//now we can perform the jnMem method. 
 
 		//CASE 1.
 		//Bit NEGATIVE is equals to 1
 		arch.getFlags().setBit(1, 1);
 		
-		//So, we will move the the number 25 (stored in the 31th position in the memory) 
+		//So, we will move the the number 17 (stored in the 31th position in the memory) 
 		//into the PC
 
-		//testing if PC stores the number 30
+		//testing if PC stores the number 10
 		arch.getPC().read();
-		assertEquals(30, arch.getExtbus1().get());		
+		assertEquals(10, arch.getExtbus1().get());		
 
 		arch.jn();
 		
-		//PC must be storng the number 25
+		//PC must be storng the number 17
 		arch.getPC().internalRead();
-		assertEquals(25, arch.getIntbus2().get());
+		assertEquals(17, arch.getIntbus2().get());
 		
 		//CASE 2.
 		//Bit NEGATIVE is equals to 0
 		arch.getFlags().setBit(1, 0);
-		//PC must have the number 30 initially (in this time, by using the external bus)
-		arch.getExtbus1().put(30);
+		//PC must have the number 17 initially (in this time, by using the external bus)
+		arch.getExtbus1().put(10);
 		arch.getPC().store();
 		//destroying the data in external bus
 		arch.getExtbus1().put(0);
 
-		//testing if PC stores the number 30
+		//testing if PC stores the number 17
 		arch.getPC().read();
-		assertEquals(30, arch.getExtbus1().get());	
+		assertEquals(10, arch.getExtbus1().get());	
 		
-		//Note that the memory was not changed. So, in position 31 we have the number 25
+		//Note that the memory was not changed. So, in position 11 we have the number 17
 		
-		//Once the ZERO bit is 0, we WILL NOT move the number 25 (stored in the 31th position in the memory)
+		//Once the ZERO bit is 0, we WILL NOT move the number 17 (stored in the 31th position in the memory)
 		//into the PC.
-		//The original PC position was 30. The parameter is in position 31. So, now PC must be pointing to 32
+		//The original PC position was 10. The parameter is in position 11. So, now PC must be pointing to 12
 		arch.jn();
-		//PC contains the number 32
+		//PC contains the number 12
 		arch.getPC().internalRead();
-		assertEquals(32, arch.getIntbus2().get());
+		assertEquals(12, arch.getIntbus2().get());
 	}
 	
-	@Test
-	public void testRead() {
-		Architecture arch = new Architecture();
-		//storing the number 10 in RPG
-		arch.getIntbus1().put(10);
-		arch.getRPG().internalStore();
-		//testing if RPG stores the number 10
-		arch.getRPG().read();
-		assertEquals(10, arch.getExtbus1().get());
+    @Test
+    public void testeJeq(){
+        Architecture arch = new Architecture();
+        //storing the number 1 in the memory, in position 11
+		arch.getMemory().getDataList()[11]=0;
+		//storing the number 0 in the memory, in position 12
+		arch.getMemory().getDataList()[12]=1;
+		//making PC points to position 10
+        //storing the number 10 in PC
+		arch.getIntbus2().put(10);
+		arch.getPC().internalStore();
 		
-		//storing the number 25 in the memory, in position 31
-		arch.getExtbus1().put(31);
-		arch.getMemory().store();
-		arch.getExtbus1().put(25);
-		arch.getMemory().store();
 		
-		//storing the number -100 in the memory, in position 25
-		arch.getExtbus1().put(25);
+        //storing the number 15 in the into the memory, in position 11, the position just after PC
+		arch.getExtbus1().put(13);
 		arch.getMemory().store();
-		arch.getExtbus1().put(-100);
+		arch.getExtbus1().put(15);
 		arch.getMemory().store();
 		
-		//PC must be pointing to the address just before the parameter (where is the instruction)
-		arch.getExtbus1().put(30);
-		arch.getPC().store();
-
-		//now we can perform the read method. 
-		//scenery PC=30, mem[31]=25, mem[25]=-100 RPG=10
-		//we will move the the number 25 (stored in the 31th position in the memory) 
-		//into the RPG by using the move command (move 31)
-
-		arch.read();
-		arch.getRPG().internalRead();
-		//the internalbus1 must contain the number -100 (that is stored in position 25)
-		assertEquals(-100, arch.getRPG().getData());
-		
-		//PC must be pointing two positions after its original value
-		arch.getPC().read();
-		assertEquals(32, arch.getExtbus1().get());
-
-	}
-	
-	@Test
-	public void testStore() {
-		Architecture arch = new Architecture();
-
-		//storing the number 25 in the memory, in position 31
-		arch.getMemory().getDataList()[31]=25;
-		
-
-		//now we can perform the store method. 
-		//store X stores, in the position X, the data that is currently in RPG
-		
-		//let's put PC pointing to the position 11
-		arch.getExtbus1().put(11);
-		arch.getPC().store();
-		//now lets put the parameter (the position where the data will be stored) into the position next to PC
-		arch.getMemory().getDataList()[12]=31;
-		
-		//storing the number 155 in RPG
-		arch.getIntbus1().put(155);
-		arch.getRPG().internalStore();
-		
-		//testing if memory contains the number 25 in the 31th position
-		arch.getExtbus1().put(31);
-		arch.getMemory().read();
-		assertEquals(25, arch.getExtbus1().get());
-		
-		//So, PC is pointing to memory[11], memory[12] has 31, memory [31] has 25 and RPG has 155
-		
-		//destroying data in externalbus 1
-		arch.getExtbus1().put(0);
-
-		arch.store();
-
-		//now, memory[31] must be updated from 25 to 155
-		assertEquals(155, arch.getMemory().getDataList()[31]);
-		
-		//PC must be pointing two positions after its original value
-		arch.getPC().read();
-		assertEquals(13, arch.getExtbus1().get());
-
-
-	}
-	
-	@Test
-	public void testLdi() {
-		Architecture arch = new Architecture();
-		//storing the number 10 in RPG
-		arch.getIntbus1().put(10);
-		arch.getRPG().internalStore();
-		
-		//the scenery: PC points to 50, mem[51] (parameter) is -40
-		
-		arch.getExtbus1().put(51);
+		arch.getExtbus1().put(15);
 		arch.getMemory().store();
-		arch.getExtbus1().put(-40);
+		arch.getExtbus1().put(17);
 		arch.getMemory().store();
-		
-		arch.getExtbus1().put(50);
-		arch.getPC().store();
-		
-		//destroying data in internalbus 1
-		arch.getIntbus1().put(0);
+        
+        // caso não igual
 
-		//now we can perform the ldi method. 
-		//we will move the the number -40 (immediate value) 
-		//into the rpg
-		arch.ldi();
-		
-		arch.getRPG().read();
-		//the externalbus1 must contains the number 44
-		assertEquals(-40, arch.getExtbus1().get());
-		
-		//PC must be pointing two positions after its original value
-		arch.getPC().read();
-		assertEquals(52, arch.getExtbus1().get());
-
-	}
-	
-	@Test
-	public void testInc() {
-		Architecture arch = new Architecture();
-		//storing the number 10 in RPG
-		arch.getExtbus1().put(10);
-		arch.getRPG().store();
-		//testing if RPG stores the number 10
-		arch.getRPG().read();
-		assertEquals(10, arch.getExtbus1().get());
-
-		//destroying data in externalbus 1
-		arch.getExtbus1().put(0);
-		
-		//pc points to 50 (where we suppose the instruction is
-		arch.getExtbus1().put(50);
-		arch.getPC().store();
-
-		//now we can perform the inc method. 
-		arch.inc();
-		arch.getRPG().read();
-		//the externalbus1 must contains the number 11
-		assertEquals(11, arch.getExtbus1().get());
-		
-		//PC must be pointing ONE position after its original value, because this command has no parameters!
-		arch.getPC().read();
-		assertEquals(51, arch.getExtbus1().get());
-
-	}
-	
-	@Test
-	public void testMoveRegReg() {
-		Architecture arch = new Architecture();
-
-		//storing the number 1 in the memory, in position 31
-		arch.getMemory().getDataList()[31]=1;
-		//storing the number 0 in the memory, in position 32
-		arch.getMemory().getDataList()[32]=0;
-		//making PC points to position 30
-		arch.getExtbus1().put(30);
-		arch.getPC().store();
-		
-		
-		//now setting the registers values
+         //now setting the registers values
 		arch.getIntbus1().put(45);
 		arch.getRegistersList().get(0).store(); //RPG0 has 45
 		arch.getIntbus1().put(99);
 		arch.getRegistersList().get(1).store(); //RPG1 has 99
+        //testing if PC stores the number 10
+		arch.getPC().read();
+		assertEquals(10, arch.getExtbus1().get());
+        arch.jeq();
+            
+        //PC must be storng the number 14
+		arch.getPC().internalRead();
+		assertEquals(14, arch.getIntbus2().get());
+
+        // caso igual
+		arch.getIntbus2().put(10);
+		arch.getPC().internalStore();
 		
-		//executing the command move REG1 REG0.
-		arch.moveRegReg();
-		
-		//testing if both REG1 and REG0 store the same value: 99
-		arch.getRegistersList().get(0).read();
-		assertEquals(99, arch.getIntbus1().get());
-		arch.getRegistersList().get(1).read();
-		assertEquals(99, arch.getIntbus1().get());
-		
-		//Testing if PC points to 3 positions after the original
-		//PC was pointing to 30; now it must be pointing to 33
-		arch.getPC().read();assertEquals(33, arch.getExtbus1().get());
-	}
+        arch.getIntbus1().put(45);
+		arch.getRegistersList().get(0).store(); //RPG0 has 45
+		arch.getRegistersList().get(1).store(); //RPG1 has 45
+
+        arch.getPC().read();
+		assertEquals(10, arch.getExtbus1().get());
+        arch.jeq();
+        
+        //PC must be storng the number 17
+		arch.getPC().internalRead();
+		assertEquals(17, arch.getIntbus2().get());
+
+     }
 	
 	@Test
-	public void testJneq() { //Test for public void jneq()
+	public void testJneq() {
 		Architecture arch = new Architecture(); //jneq %<regA> %<regB> <mem>   || se RegA!=RegB então PC <- mem (desvio condicional)
 
 		// Setup memory values
@@ -881,8 +933,8 @@ public class TestArchitecture {
 		assertEquals(34, arch.getExtbus1().get());
 	}
 	
-	@Test
 	
+	@Test
 	public void  testCall() {
 		
 		Architecture arch = new Architecture();
@@ -987,14 +1039,20 @@ public class TestArchitecture {
 		assertTrue("subMemReg".equals(commands.get(5)));  // 5
 		assertTrue("subRegMem".equals(commands.get(6)));  // 6
 		assertTrue("subImmReg".equals(commands.get(7)));  // 7
-		assertTrue("jmp".equals(commands.get(8)));        // 8
-		assertTrue("jz".equals(commands.get(9)));         // 9
-		assertTrue("jn".equals(commands.get(10)));         // 10
-		assertTrue("read".equals(commands.get(11)));       // 11
-		assertTrue("store".equals(commands.get(12)));      // 12
-		assertTrue("ldi".equals(commands.get(13)));       // 13
-		assertTrue("inc".equals(commands.get(14)));       // 14
-		assertTrue("moveRegReg".equals(commands.get(15))); // 15
+		assertTrue("moveMemReg".equals(commands.get(8))); // 8
+		assertTrue("moveRegMem".equals(commands.get(9))); // 9
+		assertTrue("moveRegReg".equals(commands.get(10))); // 10
+		assertTrue("moveImmReg".equals(commands.get(11))); // 11
+		assertTrue("inc".equals(commands.get(12)));       // 12
+		assertTrue("jmp".equals(commands.get(13)));        // 13
+		assertTrue("jn".equals(commands.get(14)));         // 14
+		assertTrue("jz".equals(commands.get(15)));         // 15
+		assertTrue("jeq".equals(commands.get(16)));         // 16
+		assertTrue("jneq".equals(commands.get(17)));         // 17
+		assertTrue("jgt".equals(commands.get(18)));         // 18
+		assertTrue("jlw".equals(commands.get(19)));         // 19
+		assertTrue("call".equals(commands.get(20)));         // 20
+		assertTrue("ret".equals(commands.get(21)));         // 21
 	}
 	
 	@Test

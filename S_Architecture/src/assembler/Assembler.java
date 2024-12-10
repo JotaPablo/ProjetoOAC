@@ -182,61 +182,69 @@ public class Assembler {
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
-		if (commandNumber == 8) { //must to proccess an jmp command
+		if (commandNumber == 8) { //must to proccess an move Mem Reg command
 			parameter = tokens[1];
-			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+			parameter = "&" + parameter;
+			parameter2 = tokens[2];
 		}
-		if (commandNumber == 9) { //must to proccess an jz command
+		if (commandNumber == 9) { //must to proccess an move Reg Mem command
 			parameter = tokens[1];
-			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+			parameter2 = tokens[2];
+			parameter2 = "&" + parameter2;
 		}
-		if (commandNumber == 10) { //must to proccess an jn command
-			parameter = tokens[1];
-			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
-		}
-		if (commandNumber == 11) { //must to proccess an read command
-			parameter = tokens[1];
-			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
-		}
-		if (commandNumber == 12) { //must to proccess an store command
-			parameter = tokens[1];
-			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
-		}
-		if (commandNumber == 13) { //must to proccess an ldi command
-			parameter = tokens[1];
-		}
-		if (commandNumber == 14) { //must to proccess an inc command
-			
-		}
-		if (commandNumber == 15) { //must to proccess an moveRegReg command
+		if (commandNumber == 10) { //must to proccess an move Reg Reg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
-		if (commandNumber == 18) { //must to proccess an jneq command
+		if (commandNumber == 11) { //must to proccess an move Imm Reg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
-			parameter3 = tokens[3];
-			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
-
 		}
-		if (commandNumber == 19) { //must to proccess an jgt command
+		if (commandNumber == 12) { //must to proccess an inc command
+			parameter = tokens[1];
+		}
+		if (commandNumber == 13) { //must to proccess an jmp command
+			parameter = tokens[1];
+			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 14) { //must to proccess an jn command
+			parameter = tokens[1];
+			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 15) { //must to proccess an jz command
+			parameter = tokens[1];
+			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 16) { //must to proccess an jeq command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 			parameter3 = tokens[3];
 			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 20) { //must to proccess an jlw command
+		if (commandNumber == 17) { //must to proccess an jneq command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 			parameter3 = tokens[3];
 			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 21) { //must to proccess an call command
+		if (commandNumber == 18) { //must to proccess an jgt command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter3 = tokens[3];
+			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 19) { //must to proccess an jlw command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter3 = tokens[3];
+			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 20) { //must to proccess an call command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 22) { //must to proccess an ret command (doesnt have any parameter)
-			
+		if (commandNumber == 21) { //must to proccess an ret command (doesnt have any parameter)
+			//n tem parametros
 		}
 		
 		objProgram.add(Integer.toString(commandNumber));
@@ -286,6 +294,16 @@ public class Assembler {
 		if ((p1.startsWith("%"))&&(p2.startsWith("%"))) { //this is a moveRegReg comand
 			p = commands.indexOf("moveRegReg");
 		}
+		else if((p1.startsWith("%"))) { //Deve ser o comando addRegMem
+			p = commands.indexOf("moveRegMem");
+		}
+		else if(p1.matches("-?\\d+") && p2.startsWith("%")){	//Deve ser o comando addIMM
+			p = commands.indexOf("moveImmReg");
+		}
+		else if((p2.startsWith("%"))) { //Deve ser o comando addMemReg
+			p = commands.indexOf("moveMemReg");
+		}
+		
 		return p;
 	}
 	
@@ -300,9 +318,6 @@ public class Assembler {
 		String p2 = tokens[2];
 		int p=-1;
 		
-		if (tokens.length != 3) {
-	        return -1; // Indica comando inválido
-	    }
 		if((p1.startsWith("%"))&&(p2.startsWith("%"))) { //Deve ser o comando addRegReg
 			p = commands.indexOf("addRegReg");
 		}
@@ -323,9 +338,6 @@ public class Assembler {
 		String p2 = tokens[2];
 		int p=-1;
 		
-		if (tokens.length != 3) {
-	        return -1; // Indica comando inválido
-	    }
 		if((p1.startsWith("%"))&&(p2.startsWith("%"))) { //Deve ser o comando subRegReg
 			p = commands.indexOf("subRegReg");
 		}

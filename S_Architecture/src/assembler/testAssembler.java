@@ -12,32 +12,38 @@ public class testAssembler {
 	@Test
 	public void testProcessCommand() {
 
-	    /*
-	     *  Tabela de instruções, com base nos microprogramas especificados
-	     *  Código    Comando       Argumento
-	     *  0         add           %<regA> %<regB>       -> RegB <- RegA + RegB
-	     *  1         add           <addr> %<regA>        -> rpg <- rpg + addr
-	     *  2         add           %<regA> <addr>        -> addr <- rpg + regA
-	     *  3         add           <imm> %<regA>         -> rpg <- regA + imm, imm precisa ser um inteiro
-	     *  4         sub           %<regA> %<regB>       -> RegB <- RegA - RegB
-	     *  5         sub           <addr> %<regA>        -> rpg <- rpg - addr
-	     *  6         sub           %<regA> <addr>        -> addr <- rpg - regA
-	     *  7         sub           <imm> %<regA>         -> rpg <- regA - imm, imm precisa ser um inteiro
-	     *  8         jmp           <addr>                -> pc <- addr
-	     *  9         jz            <addr>                -> se bitZero, pc <- addr
-	     *  10        jn            <addr>                -> se bitneg, pc <- addr
-	     *  11        read          <addr>                -> rpg <- addr
-	     *  12        store         <addr>                -> addr <- rpg
-	     *  13        ldi           <x>                   -> rpg <- x
-	     *  14        inc           -                     -> rpg++
-	     *  15        move          %<regA> %<regB>       -> regA <- regB
-	     */
+		/*
+		 *  Tabela de instruções, com base nos microprogramas especificados
+		 *  Código    Comando       Argumento
+		 *  0         add           %<regA> %<regB>       -> RegB <- RegA + RegB
+		 *  1         add           <mem> %<regA>        -> RegA <- memória[mem] + RegA
+		 *  2         add           %<regA> <mem>        -> Memória[mem] <- RegA + memória[mem]
+		 *  3         add           imm %<regA>          -> RegA <- imm + RegA
+		 *  4         sub           <regA> <regB>        -> RegB <- RegA - RegB
+		 *  5         sub           <mem> %<regA>        -> RegA <- memória[mem] - RegA
+		 *  6         sub           %<regA> <mem>        -> Memória[mem] <- RegA - memória[mem]
+		 *  7         sub           imm %<regA>          -> RegA <- imm - RegA
+		 *  8         move          <mem> %<regA>        -> RegA <- memória[mem]
+		 *  9         move          %<regA> <mem>        -> Memória[mem] <- RegA
+		 *  10        move          %<regA> %<regB>      -> RegB <- RegA
+		 *  11        move          imm %<regA>          -> RegA <- immediate
+		 *  12        inc           %<regA>              -> RegA++
+		 *  13        jmp           <mem>                -> PC <- mem (desvio incondicional)
+		 *  14        jn            <mem>                -> se última operação<0 então PC <- mem (desvio condicional)
+		 *  15        jz            <mem>                -> se última operação=0 então PC <- mem (desvio condicional)
+		 *  16        jeq           %<regA> %<regB> <mem> -> se RegA == RegB então PC <- mem (desvio condicional)
+		 *  17        jneq          %<regA> %<regB> <mem> -> se RegA != RegB então PC <- mem (desvio condicional)
+		 *  18        jgt           %<regA> %<regB> <mem> -> se RegA > RegB então PC <- mem (desvio condicional)
+		 *  19        jlw           %<regA> %<regB> <mem> -> se RegA < RegB então PC <- mem (desvio condicional)
+		 *  20        call          <mem>                -> PC <- mem, antes de desviar, empilha o endereço de retorno (endereço da instrução imediatamente posterior ao call)
+		 *  21        ret           -                     -> PC <- pop() (desvio incondicional)
+		 */
 
 	    Assembler ass = new Assembler();
-	    String commandLine[] = new String[3];
+	    String commandLine[] = new String[4];
 	    ArrayList<String> returnedObj = new ArrayList<>();
 
-	    // Primeiro teste: add %<regA> %<regB>
+	    // Teste 0: add %<regA> %<regB>
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
 	    commandLine[0] = "add";
@@ -50,7 +56,7 @@ public class testAssembler {
 	    assertEquals("%RPG1", ass.getObjProgram().get(2));
 	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
 	    
-	 // Segundo teste: add <addr> %<regB>
+	 // Terceiro teste: add <addr> %<regB>
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
 	    commandLine[0] = "add";
@@ -63,7 +69,7 @@ public class testAssembler {
 	    assertEquals("%RPG1", ass.getObjProgram().get(2));
 	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
 	    
-	 // Terceiro teste: add %<regA> <addr> 
+	 // Segundo teste: add %<regA> <addr> 
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
 	    commandLine[0] = "add";
@@ -76,7 +82,7 @@ public class testAssembler {
 	    assertEquals("&var2", ass.getObjProgram().get(2));
 	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
 	    
-	 // Terceiro teste: add imm %<regA> 
+	    //Terceiro teste: add imm %<regA> 
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
 	    commandLine[0] = "add";
@@ -84,13 +90,13 @@ public class testAssembler {
 	    commandLine[2] = "%RPG1";
 	    ass.proccessCommand(commandLine);
 	    returnedObj = ass.getObjProgram();
-	    assertEquals("3", returnedObj.get(0)); // O código de add %<regA> <addr> é 2 
+	    assertEquals("3", returnedObj.get(0)); // O código de add %<regA> <addr> é 3
 	    assertEquals("127", ass.getObjProgram().get(1));
 	    assertEquals("%RPG1", ass.getObjProgram().get(2));
 	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
 	    
 	    
-	    // Quarto teste: sub %<regA> %<regB>
+	    //Quarto teste: sub %<regA> %<regB>
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
 	    commandLine[0] = "sub";
@@ -103,7 +109,7 @@ public class testAssembler {
 	    assertEquals("%RPG1", ass.getObjProgram().get(2));
 	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
 	    
-	 // Quinto teste: sub <addr> %<regB>
+	    //Quinto teste: sub <addr> %<regB>
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
 	    commandLine[0] = "sub";
@@ -116,7 +122,7 @@ public class testAssembler {
 	    assertEquals("%RPG1", ass.getObjProgram().get(2));
 	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
 	    
-	 // Sexto teste: sub %<regA> <addr> 
+	    //Sexto teste: sub %<regA> <addr> 
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
 	    commandLine[0] = "sub";
@@ -129,7 +135,7 @@ public class testAssembler {
 	    assertEquals("&var2", ass.getObjProgram().get(2));
 	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
 	    
-	 // Setimo teste: sub imm %<regA> 
+	    //Setimo teste: sub imm %<regA> 
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
 	    commandLine[0] = "sub";
@@ -141,83 +147,35 @@ public class testAssembler {
 	    assertEquals("127", ass.getObjProgram().get(1));
 	    assertEquals("%RPG1", ass.getObjProgram().get(2));
 	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
-
-	    // Oitavo teste: jmp
+	    
+	    //Oitavo teste: move <addr> %<regB>
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
-	    commandLine[0] = "jmp";
-	    commandLine[1] = "label";
+	    commandLine[0] = "move";
+	    commandLine[1] = "var1";
+	    commandLine[2] = "%RPG1";
 	    ass.proccessCommand(commandLine);
 	    returnedObj = ass.getObjProgram();
-	    assertEquals("8", returnedObj.get(0)); // O código de jmp é 8
-	    assertEquals("&label", ass.getObjProgram().get(1));
-	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
-
-	    // Nono teste: jz
+	    assertEquals("8", returnedObj.get(0)); // O código de move <addr> %regB é 8
+	    assertEquals("&var1", ass.getObjProgram().get(1));
+	    assertEquals("%RPG1", ass.getObjProgram().get(2));
+	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
+	    
+	    //Nono teste: move %<regA> <addr> 
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
-	    commandLine[0] = "jz";
-	    commandLine[1] = "label";
+	    commandLine[0] = "move";
+	    commandLine[1] = "%RPG1";
+	    commandLine[2] = "var2";
 	    ass.proccessCommand(commandLine);
 	    returnedObj = ass.getObjProgram();
-	    assertEquals("9", returnedObj.get(0)); // O código de jz é 9
-	    assertEquals("&label", ass.getObjProgram().get(1));
-	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
-
-	    // Decimo teste: jn
-	    returnedObj = new ArrayList<>();
-	    ass = new Assembler();
-	    commandLine[0] = "jn";
-	    commandLine[1] = "label";
-	    ass.proccessCommand(commandLine);
-	    returnedObj = ass.getObjProgram();
-	    assertEquals("10", returnedObj.get(0)); // O código de jn é 10
-	    assertEquals("&label", ass.getObjProgram().get(1));
-	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
-
-	    // Decimo-primeiro teste: read
-	    returnedObj = new ArrayList<>();
-	    ass = new Assembler();
-	    commandLine[0] = "read";
-	    commandLine[1] = "address";
-	    ass.proccessCommand(commandLine);
-	    returnedObj = ass.getObjProgram();
-	    assertEquals("11", returnedObj.get(0)); // O código de read é 11
-	    assertEquals("&address", ass.getObjProgram().get(1));
-	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
-
-	    // Decimo-segundo teste: store
-	    returnedObj = new ArrayList<>();
-	    ass = new Assembler();
-	    commandLine[0] = "store";
-	    commandLine[1] = "address";
-	    ass.proccessCommand(commandLine);
-	    returnedObj = ass.getObjProgram();
-	    assertEquals("12", returnedObj.get(0)); // O código de store é 2
-	    assertEquals("&address", ass.getObjProgram().get(1));
-	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
-
-	    // Decimo-terceiro teste: ldi
-	    returnedObj = new ArrayList<>();
-	    ass = new Assembler();
-	    commandLine[0] = "ldi";
-	    commandLine[1] = "40";
-	    ass.proccessCommand(commandLine);
-	    returnedObj = ass.getObjProgram();
-	    assertEquals("13", returnedObj.get(0)); // O código de ldi é 13
-	    assertEquals("40", ass.getObjProgram().get(1));
-	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o imediato
-
-	    // Decimo-quarto teste: inc
-	    returnedObj = new ArrayList<>();
-	    ass = new Assembler();
-	    commandLine[0] = "inc";
-	    ass.proccessCommand(commandLine);
-	    returnedObj = ass.getObjProgram();
-	    assertEquals("14", returnedObj.get(0)); // O código de inc é 14
-	    assertEquals(1, ass.getObjProgram().size()); // Apenas uma linha: o comando sem parâmetros
-
-	    // Décimo-quinto teste: move %regA %regB
+	    assertEquals("9", returnedObj.get(0)); // O código de move %<regA> <addr> é 9 
+	    assertEquals("%RPG1", ass.getObjProgram().get(1));
+	    assertEquals("&var2", ass.getObjProgram().get(2));
+	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
+	    
+	 
+	   //Décimo teste: move %<regA> %<regB>
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
 	    commandLine[0] = "move";
@@ -225,67 +183,223 @@ public class testAssembler {
 	    commandLine[2] = "%RPG1";
 	    ass.proccessCommand(commandLine);
 	    returnedObj = ass.getObjProgram();
-	    assertEquals("15", returnedObj.get(0)); // O código de move %regA %regB é 15
+	    assertEquals("10", returnedObj.get(0)); // O código de move %regA %regB é 10
 	    assertEquals("%RPG0", ass.getObjProgram().get(1));
 	    assertEquals("%RPG1", ass.getObjProgram().get(2));
+	    assertEquals(3, ass.getObjProgram().size()); // Apenas tres linhas: o comando e o endereço
+	    
+	    //Décimo-primeiro: move <imm> %regB
+	    returnedObj = new ArrayList<>();
+	    ass = new Assembler();
+	    commandLine[0] = "move";
+	    commandLine[1] = "127";
+	    commandLine[2] = "%RPG1";
+	    ass.proccessCommand(commandLine);
+	    returnedObj = ass.getObjProgram();
+	    assertEquals("11", returnedObj.get(0)); // O código de move <imm> %regB é 11
+	    assertEquals("127", ass.getObjProgram().get(1));
+	    assertEquals("%RPG1", ass.getObjProgram().get(2));
 	    assertEquals(3, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
+
+	    //Decimo segundo: inc %<regA>
+	    returnedObj = new ArrayList<>();
+	    ass = new Assembler();
+	    commandLine[0] = "inc";
+	    commandLine[1] = "%RPG3";
+	    ass.proccessCommand(commandLine);
+	    returnedObj = ass.getObjProgram();
+	    assertEquals("12", returnedObj.get(0)); // O código de inc é 12
+	    assertEquals("%RPG3", ass.getObjProgram().get(1));
+	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
+	    
+	    //Decimo terceiro: jmp <addr>               
+	    returnedObj = new ArrayList<>();
+	    ass = new Assembler();
+	    commandLine[0] = "jmp";
+	    commandLine[1] = "var1";
+	    ass.proccessCommand(commandLine);
+	    returnedObj = ass.getObjProgram();
+	    assertEquals("13", returnedObj.get(0)); // O código de jmp é 13
+	    assertEquals("&var1", ass.getObjProgram().get(1));
+	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
+
+
+        //Decimo quarto: jn <addr>
+	    returnedObj = new ArrayList<>();
+	    ass = new Assembler();
+	    commandLine[0] = "jn";
+	    commandLine[1] = "var1";
+	    ass.proccessCommand(commandLine);
+	    returnedObj = ass.getObjProgram();
+	    assertEquals("14", returnedObj.get(0)); // O código de jn é 14
+	    assertEquals("&var1", ass.getObjProgram().get(1));
+	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
+	    
+        //Decimo quinto: jz <addr>
+	    returnedObj = new ArrayList<>();
+	    ass = new Assembler();
+	    commandLine[0] = "jz";
+	    commandLine[1] = "var1";
+	    ass.proccessCommand(commandLine);
+	    returnedObj = ass.getObjProgram();
+	    assertEquals("15", returnedObj.get(0)); // O código de jz <addr> é 15
+	    assertEquals("&var1", ass.getObjProgram().get(1));
+	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
+
+
+        //Decimo sexto: jeq %regA %regB <addr>
+        returnedObj = new ArrayList<>();
+	    ass = new Assembler();
+	    commandLine[0] = "jeq";
+	    commandLine[1] = "%RPG0";
+        commandLine[2] = "%RPG1";
+        commandLine[3] = "var1";
+	    ass.proccessCommand(commandLine);
+	    returnedObj = ass.getObjProgram();
+	    assertEquals("16", returnedObj.get(0)); // O código de jn é 16
+	    assertEquals("%RPG0", ass.getObjProgram().get(1));
+        assertEquals("%RPG1", ass.getObjProgram().get(2));
+        assertEquals("&var1", ass.getObjProgram().get(3));
+	    assertEquals(4, ass.getObjProgram().size()); // quatro linhas: o comando, o registrador A, o registrador B e o endereço
+	  
+  	   //Décimo sétimo: jneq %regA %regB <addr>
+  		returnedObj = new ArrayList<>();
+  		ass = new Assembler();
+  		commandLine[0] = "jneq";
+  		commandLine[1] = "%RPG0";
+  		commandLine[2] = "%RPG1";
+  		commandLine[3] = "label";
+  		ass.proccessCommand(commandLine);
+  		returnedObj = ass.getObjProgram();
+  		assertEquals("17", returnedObj.get(0)); //the jneq %regA %regB <addr> code is 17
+  		assertEquals("%RPG0", ass.getObjProgram().get(1));
+  		assertEquals("%RPG1", ass.getObjProgram().get(2));
+  		assertEquals("&label", ass.getObjProgram().get(3));
+  		assertEquals(4, ass.getObjProgram().size()); // 
+  	
+  		//Décimo oitavo: jgt %<regA> %<regB> <mem>
+  		returnedObj = new ArrayList<>();
+  		ass = new Assembler();
+  		commandLine[0] = "jgt";
+  		commandLine[1] = "%RPG0";
+  		commandLine[2] = "%RPG1";
+  		commandLine[3] = "label2";
+  		ass.proccessCommand(commandLine);
+  		returnedObj = ass.getObjProgram();
+  		assertEquals("18", returnedObj.get(0)); //the jgt %regA %regB <addr> code is 18
+  		assertEquals("%RPG0", ass.getObjProgram().get(1));
+  		assertEquals("%RPG1", ass.getObjProgram().get(2));
+  		assertEquals("&label2", ass.getObjProgram().get(3));
+  		assertEquals(4, ass.getObjProgram().size()); // 
+  		
+  		//Décimo nono: jlw %<regA> %<regB> <mem>
+  		returnedObj = new ArrayList<>();
+  		ass = new Assembler();
+  		commandLine[0] = "jlw";
+  		commandLine[1] = "%RPG2";
+  		commandLine[2] = "%RPG1";
+  		commandLine[3] = "label3";
+  		ass.proccessCommand(commandLine);
+  		returnedObj = ass.getObjProgram();
+  		assertEquals("19", returnedObj.get(0)); //the jlw %<regA> %<regB> <mem> code is 19
+  		assertEquals("%RPG2", ass.getObjProgram().get(1));
+  		assertEquals("%RPG1", ass.getObjProgram().get(2));
+  		assertEquals("&label3", ass.getObjProgram().get(3));
+  		assertEquals(4, ass.getObjProgram().size()); //
+  		
+  	    //Vigésimo teste : call <mem>
+	    returnedObj = new ArrayList<>();
+	    ass = new Assembler();
+	    commandLine[0] = "call";
+	    commandLine[1] = "label4";
+	    ass.proccessCommand(commandLine);
+	    returnedObj = ass.getObjProgram();
+	    assertEquals("20", returnedObj.get(0)); // O código de call <mem> é 20
+	    assertEquals("&label4", ass.getObjProgram().get(1));
+	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
+	    
+	    //Vigésimo primeiro: ret
+	    returnedObj = new ArrayList<>();
+	    ass = new Assembler();
+	    commandLine[0] = "ret";
+	    ass.proccessCommand(commandLine);
+	    returnedObj = ass.getObjProgram();
+	    assertEquals("21", returnedObj.get(0)); // O código de ret é 21
+	    assertEquals(1, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
+  	
+	 
 
 	    // Teste final: um pequeno programa
 	    returnedObj = new ArrayList<>();
 	    ass = new Assembler();
-	    commandLine[0] = "sub";
-	    commandLine[1] = "adr1";
-	    ass.proccessCommand(commandLine);
-	    commandLine[0] = "add";
-	    commandLine[1] = "%RPG0";
-	    commandLine[2] = "%RPG1";
-	    ass.proccessCommand(commandLine);
-	    commandLine[0] = "jmp";
-	    commandLine[1] = "label1";
-	    ass.proccessCommand(commandLine);
-	    commandLine[0] = "inc";
-	    ass.proccessCommand(commandLine);
-	    commandLine[0] = "jn";
-	    commandLine[1] = "label2";
-	    ass.proccessCommand(commandLine);
-	    commandLine[0] = "ldi";
-	    commandLine[1] = "86";
-	    ass.proccessCommand(commandLine);
-	    commandLine[0] = "move";
-	    commandLine[1] = "%RPG0";
-	    commandLine[2] = "%RPG1";
-	    ass.proccessCommand(commandLine);
-	    commandLine[0] = "read";
-	    commandLine[1] = "adr3";
-	    ass.proccessCommand(commandLine);
+	    // Comandos
+        commandLine[0] = "add"; // Código 0
+        commandLine[1] = "%R1";
+        commandLine[2] = "%R2";
+        ass.proccessCommand(commandLine);
+
+        commandLine[0] = "sub"; // Código 5
+        commandLine[1] = "mem1";
+        commandLine[2] = "%R3";
+        ass.proccessCommand(commandLine);
+
+        commandLine[0] = "move"; // Código 9
+        commandLine[1] = "%R2";
+        commandLine[2] = "mem2";
+        ass.proccessCommand(commandLine);
+
+        commandLine[0] = "jmp"; // Código 13
+        commandLine[1] = "label1";
+        ass.proccessCommand(commandLine);
+
+        commandLine[0] = "jn"; // Código 14
+        commandLine[1] = "label2";
+        ass.proccessCommand(commandLine);
+
+        commandLine[0] = "jeq"; // Código 16
+        commandLine[1] = "%R1";
+        commandLine[2] = "%R2";
+        commandLine[3] = "label3";
+        ass.proccessCommand(commandLine);
+
+        commandLine[0] = "call"; // Código 20
+        commandLine[1] = "subroutine1";
+        ass.proccessCommand(commandLine);
+
+        commandLine[0] = "ret"; // Código 21
+        ass.proccessCommand(commandLine);
 
 	    returnedObj = ass.getObjProgram();
-	    assertEquals(17, returnedObj.size()); // O programa de objeto deve ter 17 linhas
+	    assertEquals(20, returnedObj.size()); // O programa de objeto deve ter 20 linhas
 
-	    assertEquals("4", returnedObj.get(0)); // O código de sub é 4
-	    assertEquals("&adr1", returnedObj.get(1)); // O parâmetro
+	 // Validando os códigos e parâmetros
+        assertEquals("0", returnedObj.get(0)); // Código de add
+        assertEquals("%R1", returnedObj.get(1)); // Parâmetro
+        assertEquals("%R2", returnedObj.get(2)); // Parâmetro
 
-	    assertEquals("0", returnedObj.get(2)); // O código de add é 0
-	    assertEquals("%RPG0", returnedObj.get(3)); // O parâmetro
-	    assertEquals("%RPG1", returnedObj.get(4)); // O parâmetro
+        assertEquals("5", returnedObj.get(3)); // Código de sub
+        assertEquals("&mem1", returnedObj.get(4)); // Parâmetro
+        assertEquals("%R3", returnedObj.get(5)); // Parâmetro
 
-	    assertEquals("5", returnedObj.get(5)); // O código de jmp é 5
-	    assertEquals("&label1", returnedObj.get(6)); // O parâmetro
+        assertEquals("9", returnedObj.get(6)); // Código de move
+        assertEquals("%R2", returnedObj.get(7)); // Parâmetro
+        assertEquals("&mem2", returnedObj.get(8)); // Parâmetro
 
-	    assertEquals("11", returnedObj.get(7)); // O código de inc é 11
+        assertEquals("13", returnedObj.get(9)); // Código de jmp
+        assertEquals("&label1", returnedObj.get(10)); // Parâmetro
 
-	    assertEquals("7", returnedObj.get(8)); // O código de jn é 7
-	    assertEquals("&label2", returnedObj.get(9)); // O parâmetro
+        assertEquals("14", returnedObj.get(11)); // Código de jn
+        assertEquals("&label2", returnedObj.get(12)); // Parâmetro
 
-	    assertEquals("10", returnedObj.get(10)); // O código de ldi é 10
-	    assertEquals("86", returnedObj.get(11)); // O parâmetro
+        assertEquals("16", returnedObj.get(13)); // Código de jeq
+        assertEquals("%R1", returnedObj.get(14)); // Parâmetro
+        assertEquals("%R2", returnedObj.get(15)); // Parâmetro
+        assertEquals("&label3", returnedObj.get(16)); // Parâmetro
 
-	    assertEquals("12", returnedObj.get(12)); // O código de move é 12
-	    assertEquals("%RPG0", returnedObj.get(13)); // O parâmetro
-	    assertEquals("%RPG1", returnedObj.get(14)); // O parâmetro
+        assertEquals("20", returnedObj.get(17)); // Código de call
+        assertEquals("&subroutine1", returnedObj.get(18)); // Parâmetro
 
-	    assertEquals("8", returnedObj.get(15)); // O código de read é 8
-	    assertEquals("&adr3", returnedObj.get(16)); // O parâmetro
+        assertEquals("21", returnedObj.get(19)); // Código de ret
 	}
 
 
@@ -295,38 +409,37 @@ public class testAssembler {
 		ArrayList<String> returnedObj = new ArrayList<>();
 		ArrayList<String> sourceProgram = new ArrayList<>();
 		
-		//inserting the following program
-		/*
-		 * var1
-		 * var2
-		 * var3
-		 * ldi 10
-		 * store var3
-		 * ldi 2
-		 * store var2
-		 * ldi 0
-		 * store var1
-		 * label:
-		 * read var1
-		 * add %RPG0 %RPG1
-		 * store var1
-		 * move %RPG1 %RPG0
-		 * sub var3
-		 * jn label
-		 */
+		 // Programa com os seguintes comandos:
+	    /*
+	     * var1
+	     * var2
+	     * var3
+	     * move 10 %RPG0
+	     * move %RPG0 var3
+	     * move 2 %RPG0
+	     * move %RPG0 var2
+	     * move 0 %RPG0
+	     * move %RPG0 var1
+	     * label:
+	     * move var1 %RPG0
+	     * add %RPG0 %RPG1
+	     * move %RPG0 var1
+	     * move %RPG1 %RPG0
+	     * sub var3 %RPG0
+	     */
 		sourceProgram.add("var1");
 		sourceProgram.add("var2");
 		sourceProgram.add("var3");
-		sourceProgram.add("ldi 10");
-		sourceProgram.add("store var3");
-		sourceProgram.add("ldi 2");
-		sourceProgram.add("store var2");
-		sourceProgram.add("ldi 0");
-		sourceProgram.add("store var1");
+		sourceProgram.add("move 10 %RPG0");
+		sourceProgram.add("move %RPG0 var3");
+		sourceProgram.add("move 2 %RPG0");
+		sourceProgram.add("move %RPG0 var2");
+		sourceProgram.add("move 0 %RPG0");
+		sourceProgram.add("move %RPG0 var1");
 		sourceProgram.add("label:");
-		sourceProgram.add("read var1");
+		sourceProgram.add("move var1 %RPG0");
 		sourceProgram.add("add %RPG0 %RPG1");
-		sourceProgram.add("store var1");
+		sourceProgram.add("move %RPG0 var1");
 		sourceProgram.add("move %RPG1 %RPG0");
 		sourceProgram.add("sub var3 %RPG0");
 		sourceProgram.add("jn label");
@@ -335,49 +448,58 @@ public class testAssembler {
 		ass.setLines(sourceProgram);
 		ass.parse();
 		returnedObj = ass.getObjProgram();
-		//System.out.println(returnedObj);
+		System.out.println(returnedObj);
 		
 		//teste
-		assertEquals(27, returnedObj.size()); // Verifica o tamanho do programa gerado
+		assertEquals(35, returnedObj.size()); // Verifica o tamanho do programa gerado
+		// Checando linha por linha
+		assertEquals("11", returnedObj.get(0));  // move 10 %RPG0 (load immediate)
+		assertEquals("10", returnedObj.get(1));  // parâmetro do move
+		assertEquals("%RPG0", returnedObj.get(2));  // destino do move
 
-		//checando linha por linha
-		assertEquals("10", returnedObj.get(0)); // ldi 10
-		assertEquals("10", returnedObj.get(1)); // parâmetro do ldi
+		assertEquals("9", returnedObj.get(3));  // move %RPG0 var3 (store)
+		assertEquals("%RPG0", returnedObj.get(4));  // origem do move
+		assertEquals("&var3", returnedObj.get(5));  // destino do store
 
-		assertEquals("9", returnedObj.get(2));  // store var3
-		assertEquals("&var3", returnedObj.get(3)); // parâmetro do store
+		assertEquals("11", returnedObj.get(6));  // move 2 %RPG0 (load immediate)
+		assertEquals("2", returnedObj.get(7));   // parâmetro do move
+		assertEquals("%RPG0", returnedObj.get(8));  // destino do move
 
-		assertEquals("10", returnedObj.get(4)); // ldi 2
-		assertEquals("2", returnedObj.get(5));  // parâmetro do ldi
+		assertEquals("9", returnedObj.get(9));  // move %RPG0 var2 (store)
+		assertEquals("%RPG0", returnedObj.get(10)); // origem do move
+		assertEquals("&var2", returnedObj.get(11)); // destino do store
 
-		assertEquals("9", returnedObj.get(6));  // store var2
-		assertEquals("&var2", returnedObj.get(7)); // parâmetro do store
+		assertEquals("11", returnedObj.get(12));  // move 0 %RPG0 (load immediate)
+		assertEquals("0", returnedObj.get(13));   // parâmetro do move
+		assertEquals("%RPG0", returnedObj.get(14));  // destino do move
 
-		assertEquals("10", returnedObj.get(8));  // ldi 0
-		assertEquals("0", returnedObj.get(9));   // parâmetro do ldi
+		assertEquals("9", returnedObj.get(15));  // move %RPG0 var1 (store)
+		assertEquals("%RPG0", returnedObj.get(16)); // origem do move
+		assertEquals("&var1", returnedObj.get(17)); // destino do store
 
-		assertEquals("9", returnedObj.get(10));  // store var1
-		assertEquals("&var1", returnedObj.get(11)); // parâmetro do store
+		assertEquals("8", returnedObj.get(18));  // move var1 %RPG0 (load)
+		assertEquals("&var1", returnedObj.get(19)); // origem do load
+		assertEquals("%RPG0", returnedObj.get(20)); // destino do move
 
-		assertEquals("8", returnedObj.get(12));  // read var1
-		assertEquals("&var1", returnedObj.get(13)); // parâmetro do read
+		assertEquals("0", returnedObj.get(21));  // add %RPG0 %RPG1
+		assertEquals("%RPG0", returnedObj.get(22)); // primeiro parâmetro do add
+		assertEquals("%RPG1", returnedObj.get(23)); // segundo parâmetro do add
 
-		assertEquals("0", returnedObj.get(14));  // add %RPG0 %RPG1
-		assertEquals("%RPG0", returnedObj.get(15)); // primeiro parâmetro do add
-		assertEquals("%RPG1", returnedObj.get(16)); // segundo parâmetro do add
+		assertEquals("9", returnedObj.get(24));  // move %RPG0 var1 (store)
+		assertEquals("%RPG0", returnedObj.get(25)); // origem do move
+		assertEquals("&var1", returnedObj.get(26)); // destino do store
 
-		assertEquals("9", returnedObj.get(17));  // store var1
-		assertEquals("&var1", returnedObj.get(18)); // parâmetro do store
+		assertEquals("10", returnedObj.get(27));  // move %RPG1 %RPG0
+		assertEquals("%RPG1", returnedObj.get(28)); // origem do move
+		assertEquals("%RPG0", returnedObj.get(29)); // destino do move
 
-		assertEquals("12", returnedObj.get(19));  // move %RPG1 %RPG0
-		assertEquals("%RPG1", returnedObj.get(20)); // primeiro parâmetro do move
-		assertEquals("%RPG0", returnedObj.get(21)); // segundo parâmetro do move
+		assertEquals("5", returnedObj.get(30));  // sub var3 %RPG0
+		assertEquals("&var3", returnedObj.get(31)); // origem do sub
+		assertEquals("%RPG0", returnedObj.get(32)); // destino do sub
 
-		assertEquals("4", returnedObj.get(22));  // sub var3
-		assertEquals("&var3", returnedObj.get(23)); // parâmetro do sub
-
-		assertEquals("7", returnedObj.get(24));  // jn label
-		assertEquals("&label", returnedObj.get(25)); // parâmetro do jn
+		assertEquals("14", returnedObj.get(33));  // jn label
+		assertEquals("&label", returnedObj.get(34)); // parâmetro do jn
+		
 		
 		//now, checking if the label "label" was inserted, pointing to the position 12
 		//the line 'read var1' is just after the label
@@ -387,7 +509,7 @@ public class testAssembler {
 		assertEquals(1, ass.getLabels().size());
 		assertEquals(1, ass.getLabelsAddresses().size());
 		assertEquals(0, ass.getLabels().indexOf("label"));
-		assertEquals(12, (int) ass.getLabelsAddresses().get(0));
+		assertEquals(18, (int) ass.getLabelsAddresses().get(0));
 		
 		//checking if all variables are stored in variables collection
 		assertEquals("var1", ass.getVariables().get(0));
