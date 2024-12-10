@@ -189,7 +189,7 @@ public class Architecture {
 		commandsList.add("jmp");   //8
 		commandsList.add("jn");    //9
 		commandsList.add("jz");    //10
-        commandsList.add("jeq");   //11
+                commandsList.add("jeq");   //11
 		commandsList.add("read");  //12
 		commandsList.add("store"); //13
 		commandsList.add("ldi");   //14
@@ -758,7 +758,7 @@ public class Architecture {
 		PC.internalStore(); //now PC points to the parameter address
 		PC.read();
 		memory.read();
-        memory.read();
+		memory.read();
 		PC.store();
 	}
 	
@@ -793,22 +793,22 @@ public class Architecture {
 	 */
 	public void jz() {
 		PC.internalRead();
-        ula.internalStore(1);
-        ula.inc();
-        ula.internalRead(1);
-        PC.internalStore();
-        PC.read();
-        memory.read();
-        memory.read();
-        statusMemory.storeIn1();
-        ula.inc();
-        ula.internalRead(1);
-        PC.internalStore();
-        PC.read();
-        statusMemory.storeIn0();
-        extbus1.put(Flags.getBit(0));
-        statusMemory.read();
-        PC.store();
+	        ula.internalStore(1);
+	        ula.inc();
+	        ula.internalRead(1);
+	        PC.internalStore();
+	        PC.read();
+	        memory.read();
+	        memory.read();
+	        statusMemory.storeIn1();
+	        ula.inc();
+	        ula.internalRead(1);
+	        PC.internalStore();
+	        PC.read();
+	        statusMemory.storeIn0();
+	        extbus1.put(Flags.getBit(0));
+	        statusMemory.read();
+	        PC.store();
 	}
 	
     /**
@@ -841,23 +841,23 @@ public class Architecture {
 	 * @param memory
 	 */
 	public void jn() {
-        PC.internalRead();
-        ula.internalStore(1);
-        ula.inc();
-        ula.internalRead(1);
-        PC.internalStore();
-        PC.read();
-        memory.read();
-        memory.read();
-        statusMemory.storeIn1();
-        ula.inc();
-        ula.internalRead(1);
-        PC.internalStore();
-        PC.read();
-        statusMemory.storeIn0();
-        extbus1.put(Flags.getBit(1));
-        statusMemory.read();
-        PC.store();
+	        PC.internalRead();
+	        ula.internalStore(1);
+	        ula.inc();
+	        ula.internalRead(1);
+	        PC.internalStore();
+	        PC.read();
+	        memory.read();
+	        memory.read();
+	        statusMemory.storeIn1();
+	        ula.inc();
+	        ula.internalRead(1);
+	        PC.internalStore();
+	        PC.read();
+	        statusMemory.storeIn0();
+	        extbus1.put(Flags.getBit(1));
+	        statusMemory.read();
+	        PC.store();
 	}
 
     /**
