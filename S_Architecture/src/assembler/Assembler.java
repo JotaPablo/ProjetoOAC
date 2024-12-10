@@ -144,6 +144,7 @@ public class Assembler {
 		String command = tokens[0];
 		String parameter ="";
 		String parameter2 = "";
+        String parameter3 = "";
 		int commandNumber = findCommandNumber(tokens);
 		if (commandNumber == 0) { //must to proccess an add Reg Reg command
 			parameter = tokens[1];
@@ -171,29 +172,35 @@ public class Assembler {
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 6) { //must to proccess an jz command
+		if (commandNumber == 6) { //must to proccess an jn command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 7) { //must to proccess an jn command
+		if (commandNumber == 7) { //must to proccess an jz command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 8) { //must to proccess an read command
+        if(commandNumber == 8) { //must to proccess an jeq command
+        	parameter = tokens[1];
+            parameter2 = tokens[2];
+            parameter3 = tokens[3];
+        	parameter3 = "&"+parameter3;//this is a flag to indicate that is a position in memory
+        }
+		if (commandNumber == 9) { //must to proccess an read command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 9) { //must to proccess an store command
+		if (commandNumber == 10) { //must to proccess an store command
 			parameter = tokens[1];
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
-		if (commandNumber == 10) { //must to proccess an ldi command
+		if (commandNumber == 11) { //must to proccess an ldi command
 			parameter = tokens[1];
 		}
-		if (commandNumber == 11) { //must to proccess an inc command
+		if (commandNumber == 12) { //must to proccess an inc command
 			
 		}
-		if (commandNumber == 12) { //must to proccess an moveRegReg command
+		if (commandNumber == 13) { //must to proccess an moveRegReg command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}

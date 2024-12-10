@@ -184,10 +184,10 @@ public class Architecture {
 		commandsList.add("addRegMem"); //2
 		commandsList.add("addImmReg"); //3
 		commandsList.add("sub");   //4
-		commandsList.add("jmpMem");   //5
-		commandsList.add("jnMem");    //6
-        commandsList.add("jzMem");    //7
-		commandsList.add("jeqRegRegMem");   //8
+		commandsList.add("jmp");   //5
+		commandsList.add("jn");    //6
+        commandsList.add("jz");    //7
+		commandsList.add("jeq");   //8
 		commandsList.add("read");  //9
 		commandsList.add("store"); //10
 		commandsList.add("ldi");   //11
@@ -608,7 +608,7 @@ public class Architecture {
      * 
      *@param memory
     */
-	public void jmpMem() {
+	public void jmp() {
 		PC.internalRead();
 		ula.internalStore(1);
 		ula.inc();
@@ -649,7 +649,7 @@ public class Architecture {
      * fim
 	 * @param memory
 	 */
-	public void jzMem() {
+	public void jz() {
 		PC.internalRead();
         ula.internalStore(1);
         ula.inc();
@@ -698,7 +698,7 @@ public class Architecture {
      * fim
 	 * @param memory
 	 */
-	public void jnMem() {
+	public void jn() {
         PC.internalRead();
         ula.internalStore(1);
         ula.inc();
@@ -778,7 +778,7 @@ public class Architecture {
  *@param registerB
  *@param memory
  */
-    public void jeqRegRegMem(){
+    public void jeq(){
         //leitura do primeiro registrador
         PC.internalRead(); //agora PC está no intbus2
         ula.internalStore(1); // ula grava no reg 1 o valor obtido de intbus2
@@ -1161,16 +1161,16 @@ public class Architecture {
 			sub();
 			break;
 		case 5:
-			jmpMem();
+			jmp();
 			break;
 		case 6:
-			jnMem();
+			jn();
 			break;
 		case 7:
-			jzMem();
+			jz();
 			break;
 		case 8:
-			jeqRegRegMem();
+			jeq();
 			break;
         case 9:
             read();
