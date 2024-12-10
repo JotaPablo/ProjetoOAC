@@ -326,6 +326,17 @@ public class testAssembler {
 	    returnedObj = ass.getObjProgram();
 	    assertEquals("21", returnedObj.get(0)); // O código de ret é 21
 	    assertEquals(1, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
+	    
+	    //Vigésimo segundo : startStk <var>
+	    returnedObj = new ArrayList<>();
+	    ass = new Assembler();
+	    commandLine[0] = "startStk";
+	    commandLine[1] = "$DEGAS_START_VALUE$";
+	    ass.proccessCommand(commandLine);
+	    returnedObj = ass.getObjProgram();
+	    assertEquals("22", returnedObj.get(0)); // O código de call <mem> é 22
+	    assertEquals("&$DEGAS_START_VALUE$", ass.getObjProgram().get(1));
+	    assertEquals(2, ass.getObjProgram().size()); // Apenas duas linhas: o comando e o endereço
   	
 	 
 

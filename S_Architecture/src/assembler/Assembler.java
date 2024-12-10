@@ -101,6 +101,9 @@ public class Assembler {
 		   BufferedReader br = new BufferedReader(new		 
 		   FileReader(filename+".dsf"));
 		   String linha;
+		   lines.add("startStk $DEGAS_START_VALUE$"); //Em todo programa tem o start com uma variavel que vai ser reposta futuramente
+		   											  //É  importante adicioanr antes da leitura do programa pois se não interferiria nos endereços
+		   											 // dos labels se esse coomando for adicionado depois
 		   while ((linha = br.readLine()) != null) {
 			     lines.add(linha);
 			}
@@ -130,7 +133,7 @@ public class Assembler {
 					variables.add(tokens[0]);
 			}
 		}
-		
+		variables.add("$DEGAS_START_VALUE$"); //É a ultima a ser colocada pois vai indicar a primeira posição livre depois da substituição de todas as variaveis
 	}
 
 
@@ -244,9 +247,12 @@ public class Assembler {
 			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
 		}
 		if (commandNumber == 21) { //must to proccess an ret command (doesnt have any parameter)
-			//n tem parametros
+			//não tem parametros
 		}
-		
+		if(commandNumber == 22) { // must to process an startStk command
+			parameter = tokens[1];
+			parameter = "&"+parameter;
+		}
 		objProgram.add(Integer.toString(commandNumber));
 		if (!parameter.isEmpty()) {
 			objProgram.add(parameter);

@@ -1001,7 +1001,37 @@ public class TestArchitecture {
 				 arch.getRegistersList().get(4).read();
 				 assertEquals(124, arch.getExtbus1().get());
 	}
-			
+	
+	@Test
+	public void teststartStk() {
+		Architecture arch = new Architecture();
+
+		// Armazenando o número 1 na memória, na posição 31
+		arch.getMemory().getDataList()[31] = 125;
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getExtbus1().put(31);
+	    arch.getRegistersList().get(4).store();
+	    arch.getRegistersList().get(5).store();
+
+		// Executando o comando startstk
+		arch.startStk();
+
+		// Testando se stktop e bot receberam os valores corretos
+	    arch.getRegistersList().get(4).read();
+	    assertEquals(125, arch.getExtbus1().get());
+	    arch.getRegistersList().get(5).read();
+	    assertEquals(125, arch.getExtbus1().get());
+
+		// Testando se o PC aponta para 2 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 32
+		arch.getPC().read();
+		assertEquals(32, arch.getExtbus1().get());
+	}
+
 			
 		
 	
@@ -1053,6 +1083,8 @@ public class TestArchitecture {
 		assertTrue("jlw".equals(commands.get(19)));         // 19
 		assertTrue("call".equals(commands.get(20)));         // 20
 		assertTrue("ret".equals(commands.get(21)));         // 21
+		assertTrue("startStk".equals(commands.get(22)));         // 22
+
 	}
 	
 	@Test

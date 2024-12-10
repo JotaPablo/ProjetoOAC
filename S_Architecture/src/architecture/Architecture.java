@@ -200,6 +200,7 @@ public class Architecture {
 		commandsList.add("jlw"); //19
 		commandsList.add("call"); //20
 		commandsList.add("ret"); //21
+		commandsList.add("startStk"); //22
 	}
 
 	
@@ -993,66 +994,66 @@ public class Architecture {
 	        PC.store();
 	}
 
-    /**
- * Este método implementa o microprograma para
- *                      jeq reg reg mem
- * No código de máquina, este comando possui um número específico (a ser definido), e seus parâmetros estão nas posições seguintes:
- * - O primeiro parâmetro é o ID do primeiro registrador a ser comparado.
- * - O segundo parâmetro é o ID do segundo registrador a ser comparado.
- * - O terceiro parâmetro é o endereço de memória para onde será feito o salto caso os registradores sejam iguais.
- * 
- * O método lê os IDs dos dois registradores da memória, nas posições logo após o comando, e realiza uma comparação entre os valores contidos nesses registradores.
- * Se os valores forem iguais (flag ZERO setado), o programa salta para o endereço especificado. Caso contrário, continua para a próxima instrução.
- * 
- * A lógica é:
- * 1. pc -> intbus2                            // PC.internalRead()
- * 2. ula <- intbus2                           // ula.internalStore(1)
- * 3. ula inc                                  // ula.inc()
- * 4. ula -> intbus2                           // ula.internalRead(1)
- * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o primeiro parâmetro)
- * 6. pc -> extbus                             // PC.read()
- * 7. memória -> extbus                        // memory.read() (ID do primeiro registrador no extbus)
- * 8. demux <- extbus                          // demux.setValue(extbus1.get())
- * 9. registradores -> intbus2                 // registersInternalRead()
- * 10. ula <- intbus2                          // ula.internalStore(0) (valor armazenado em ULA[0])
-
- * 11. ula inc                                 // ula.inc()
- * 12. ula -> intbus2                          // ula.internalRead(1)
- * 13. pc <- intbus2                           // PC.internalStore() (PC aponta para o segundo parâmetro)
- * 14. pc -> extbus                            // PC.read()
- * 15. memória -> extbus                       // memory.read() (ID do segundo registrador no extbus)
- * 16. demux <- extbus                         // demux.setValue(extbus1.get())
- * 17. registradores -> intbus2                // registersInternalRead()
- * 18. ula <- intbus2                          // ula.internalStore(1) (valor armazenado em ULA[1])
-
- * 19. ula sub                                 // ula.sub() (ULA[0] - ULA[1])
- * 20. ula -> intbus2                          // ula.internalRead(1)
- * 21. alterar flags                           // setStatusFlags(intbus2.get())
-
- * 22. pc -> intbus2                           // PC.internalRead()
- * 23. ula <- intbus2                          // ula.internalStore(1)
- * 24. ula inc                                 // ula.inc()
- * 25. ula -> intbus2                          // ula.internalRead(1)
- * 26. pc <- intbus2                           // PC.internalStore() (PC aponta para o terceiro parâmetro)
- * 27. pc -> extbus                            // PC.read()
- * 28. memória -> extbus                       // memory.read() (posição de memória onde está o endereço de salto)
- * 29. memória -> extbus                       // memory.read() (endereço de salto no extbus)
- * 30. statusMemory(1) <- extbus               // statusMemory.storeIn1()
-
- * 31. ula inc                                 // ula.inc()
- * 32. ula -> intbus2                          // ula.internalRead(1)
- * 33. pc <- intbus2                           // PC.internalStore() (PC aponta para a próxima instrução)
- * 34. pc -> extbus                            // PC.read()
- * 35. statusMemory(0) <- extbus               // statusMemory.storeIn0()
-
- * 36. extbus <- flags(bitZERO)                // extbus1.put(flags.getBit(0))
- * 37. statusMemory -> extbus                  // statusMemory.read() (seleciona endereço com base no flag ZERO)
- * 38. pc <- extbus                            // PC.store() (atualiza o PC com o endereço selecionado)
- * fim
- *@param registerA
- *@param registerB
- *@param memory
- */
+	    /**
+	 * Este método implementa o microprograma para
+	 *                      jeq reg reg mem
+	 * No código de máquina, este comando possui um número específico (a ser definido), e seus parâmetros estão nas posições seguintes:
+	 * - O primeiro parâmetro é o ID do primeiro registrador a ser comparado.
+	 * - O segundo parâmetro é o ID do segundo registrador a ser comparado.
+	 * - O terceiro parâmetro é o endereço de memória para onde será feito o salto caso os registradores sejam iguais.
+	 * 
+	 * O método lê os IDs dos dois registradores da memória, nas posições logo após o comando, e realiza uma comparação entre os valores contidos nesses registradores.
+	 * Se os valores forem iguais (flag ZERO setado), o programa salta para o endereço especificado. Caso contrário, continua para a próxima instrução.
+	 * 
+	 * A lógica é:
+	 * 1. pc -> intbus2                            // PC.internalRead()
+	 * 2. ula <- intbus2                           // ula.internalStore(1)
+	 * 3. ula inc                                  // ula.inc()
+	 * 4. ula -> intbus2                           // ula.internalRead(1)
+	 * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o primeiro parâmetro)
+	 * 6. pc -> extbus                             // PC.read()
+	 * 7. memória -> extbus                        // memory.read() (ID do primeiro registrador no extbus)
+	 * 8. demux <- extbus                          // demux.setValue(extbus1.get())
+	 * 9. registradores -> intbus2                 // registersInternalRead()
+	 * 10. ula <- intbus2                          // ula.internalStore(0) (valor armazenado em ULA[0])
+	
+	 * 11. ula inc                                 // ula.inc()
+	 * 12. ula -> intbus2                          // ula.internalRead(1)
+	 * 13. pc <- intbus2                           // PC.internalStore() (PC aponta para o segundo parâmetro)
+	 * 14. pc -> extbus                            // PC.read()
+	 * 15. memória -> extbus                       // memory.read() (ID do segundo registrador no extbus)
+	 * 16. demux <- extbus                         // demux.setValue(extbus1.get())
+	 * 17. registradores -> intbus2                // registersInternalRead()
+	 * 18. ula <- intbus2                          // ula.internalStore(1) (valor armazenado em ULA[1])
+	
+	 * 19. ula sub                                 // ula.sub() (ULA[0] - ULA[1])
+	 * 20. ula -> intbus2                          // ula.internalRead(1)
+	 * 21. alterar flags                           // setStatusFlags(intbus2.get())
+	
+	 * 22. pc -> intbus2                           // PC.internalRead()
+	 * 23. ula <- intbus2                          // ula.internalStore(1)
+	 * 24. ula inc                                 // ula.inc()
+	 * 25. ula -> intbus2                          // ula.internalRead(1)
+	 * 26. pc <- intbus2                           // PC.internalStore() (PC aponta para o terceiro parâmetro)
+	 * 27. pc -> extbus                            // PC.read()
+	 * 28. memória -> extbus                       // memory.read() (posição de memória onde está o endereço de salto)
+	 * 29. memória -> extbus                       // memory.read() (endereço de salto no extbus)
+	 * 30. statusMemory(1) <- extbus               // statusMemory.storeIn1()
+	
+	 * 31. ula inc                                 // ula.inc()
+	 * 32. ula -> intbus2                          // ula.internalRead(1)
+	 * 33. pc <- intbus2                           // PC.internalStore() (PC aponta para a próxima instrução)
+	 * 34. pc -> extbus                            // PC.read()
+	 * 35. statusMemory(0) <- extbus               // statusMemory.storeIn0()
+	
+	 * 36. extbus <- flags(bitZERO)                // extbus1.put(flags.getBit(0))
+	 * 37. statusMemory -> extbus                  // statusMemory.read() (seleciona endereço com base no flag ZERO)
+	 * 38. pc <- extbus                            // PC.store() (atualiza o PC com o endereço selecionado)
+	 * fim
+	 *@param registerA
+	 *@param registerB
+	 *@param memory
+	 */
     public void jeq(){
         //leitura do primeiro registrador
         PC.internalRead(); //agora PC está no intbus2
@@ -1395,6 +1396,26 @@ public class Architecture {
 		PC.store();
 	}
 	
+	public void startStk(){
+		//pc ++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		//lendo da memoria e guardando nos stks
+		PC.read();
+		memory.read();
+		StkBOT.store();
+		StkTOP.store();
+		//pc ++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
+	
 	
 	
 	
@@ -1508,16 +1529,16 @@ public class Architecture {
 			subImmReg();
 			break;
 		case 8:
-			//moveMemReg();
+			moveMemReg();
 			break;
 		case 9:
-			//moveRegMem();
+			moveRegMem();
 			break;
 		case 10:
 			moveRegReg();
 			break;
 		case 11:
-			//moveImmReg();
+			moveImmReg();
 			break;
 		case 12:
 			inc();
@@ -1548,6 +1569,9 @@ public class Architecture {
 			break;
 		case 21:
 			ret();
+			break;
+		case 22:
+			startStk();
 			break;
 		default:
 			halt = true;
