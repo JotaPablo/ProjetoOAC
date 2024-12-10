@@ -601,8 +601,9 @@ public class Architecture {
      * 4. ula -> intbus2                           // ula.internalRead(1)
      * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o endereço de parâmetro)
      * 6. pc -> extbus1                             // PC.read() coloca o endereço de parâmetro no extbus1
-     * 7. memory.read()                             // memory.read() lê o endereço de salto do extbus
-     * 8. PC.store()                                // PC.store() atualiza o PC com o endereço de salto
+     * 7. memory.read()                             // memory.read() lê o endereço da posição de memoria onde está o endereço de salto
+     * 8. memory.read()                             // memory.read() lê o endereço de salto do extbus
+     * 9. PC.store()                                // PC.store() atualiza o PC com o endereço de salto
      * fim
      * 
      *@param memory
@@ -615,6 +616,7 @@ public class Architecture {
 		PC.internalStore(); //now PC points to the parameter address
 		PC.read();
 		memory.read();
+        memory.read();
 		PC.store();
 	}
 	
@@ -633,16 +635,17 @@ public class Architecture {
      * 4. ula -> intbus2                           // ula.internalRead(1)
      * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o parâmetro)
      * 6. pc -> extbus                             // PC.read()
-     * 7. memória -> extbus                        // memory.read() (endereço de salto no extbus)
-     * 8. statusMemory(1) <- extbus                // statusMemory.storeIn1()
-     * 9. ula inc                                  // ula.inc()
-     * 10. ula -> intbus2                          // ula.internalRead(1)
-     * 11. pc <- intbus2                           // PC.internalStore() (PC aponta para a próxima instrução)
-     * 12. pc -> extbus                            // PC.read()
-     * 13. statusMemory(0) <- extbus               // statusMemory.storeIn0()
-     * 14. extbus <- flags(bitZERO)            // extbus1.put(flags.getBit(1))
-     * 15. statusMemory -> extbus                  // statusMemory.read() (seleciona endereço com base no bit NEGATIVE)
-     * 16. pc <- extbus                            // PC.store() (atualiza o PC com o endereço selecionado)
+     * 7. memória -> extbus                        // memory.read() (posição da memoria onde está o endereço de salto)
+     * 9. memoria -> extbus                        // memory.read() (endereço de salto no extbus)
+     * 10. statusMemory(1) <- extbus                // statusMemory.storeIn1()
+     * 11. ula inc                                  // ula.inc()
+     * 12. ula -> intbus2                          // ula.internalRead(1)
+     * 13. pc <- intbus2                           // PC.internalStore() (PC aponta para a próxima instrução)
+     * 14. pc -> extbus                            // PC.read()
+     * 15. statusMemory(0) <- extbus               // statusMemory.storeIn0()
+     * 16. extbus <- flags(bitZERO)            // extbus1.put(flags.getBit(1))
+     * 17. statusMemory -> extbus                  // statusMemory.read() (seleciona endereço com base no bit NEGATIVE)
+     * 18. pc <- extbus                            // PC.store() (atualiza o PC com o endereço selecionado)
      * fim
 	 * @param memory
 	 */
@@ -653,6 +656,7 @@ public class Architecture {
         ula.internalRead(1);
         PC.internalStore();
         PC.read();
+        memory.read();
         memory.read();
         statusMemory.storeIn1();
         ula.inc();
@@ -680,7 +684,8 @@ public class Architecture {
      * 4. ula -> intbus2                           // ula.internalRead(1)
      * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o parâmetro)
      * 6. pc -> extbus                             // PC.read()
-     * 7. memória -> extbus                        // memory.read() (endereço de salto no extbus)
+     * 7. memória -> extbus                        // memory.read() (posição da memoria onde está o endereço de salto)
+     * 8. memória -> extbus                        // memory.read() (endereço de salto no extbus)
      * 8. statusMemory(1) <- extbus                // statusMemory.storeIn1()
      * 9. ula inc                                  // ula.inc()
      * 10. ula -> intbus2                          // ula.internalRead(1)
@@ -700,6 +705,7 @@ public class Architecture {
         ula.internalRead(1);
         PC.internalStore();
         PC.read();
+        memory.read();
         memory.read();
         statusMemory.storeIn1();
         ula.inc();
@@ -754,18 +760,19 @@ public class Architecture {
  * 25. ula -> intbus2                          // ula.internalRead(1)
  * 26. pc <- intbus2                           // PC.internalStore() (PC aponta para o terceiro parâmetro)
  * 27. pc -> extbus                            // PC.read()
- * 28. memória -> extbus                       // memory.read() (endereço de salto no extbus)
- * 29. statusMemory(1) <- extbus               // statusMemory.storeIn1()
+ * 28. memória -> extbus                       // memory.read() (posição de memória onde está o endereço de salto)
+ * 29. memória -> extbus                       // memory.read() (endereço de salto no extbus)
+ * 30. statusMemory(1) <- extbus               // statusMemory.storeIn1()
 
- * 30. ula inc                                 // ula.inc()
- * 31. ula -> intbus2                          // ula.internalRead(1)
- * 32. pc <- intbus2                           // PC.internalStore() (PC aponta para a próxima instrução)
- * 33. pc -> extbus                            // PC.read()
- * 34. statusMemory(0) <- extbus               // statusMemory.storeIn0()
+ * 31. ula inc                                 // ula.inc()
+ * 32. ula -> intbus2                          // ula.internalRead(1)
+ * 33. pc <- intbus2                           // PC.internalStore() (PC aponta para a próxima instrução)
+ * 34. pc -> extbus                            // PC.read()
+ * 35. statusMemory(0) <- extbus               // statusMemory.storeIn0()
 
- * 35. extbus <- flags(bitZERO)                // extbus1.put(flags.getBit(0))
- * 36. statusMemory -> extbus                  // statusMemory.read() (seleciona endereço com base no flag ZERO)
- * 37. pc <- extbus                            // PC.store() (atualiza o PC com o endereço selecionado)
+ * 36. extbus <- flags(bitZERO)                // extbus1.put(flags.getBit(0))
+ * 37. statusMemory -> extbus                  // statusMemory.read() (seleciona endereço com base no flag ZERO)
+ * 38. pc <- extbus                            // PC.store() (atualiza o PC com o endereço selecionado)
  * fim
  *@param registerA
  *@param registerB
@@ -806,7 +813,8 @@ public class Architecture {
         ula.internalRead(1); // ula joga o valor para intbus2
         PC.internalStore(); // PC armazena o valor de intbus2
         PC.read(); // PC joga o valor para o extbus
-        memory.read(); // memory lê o valor do extbus e joga o id do registrador para o extbus
+        memory.read(); // memory lê o valor do extbus e joga o endereço de memória para o extbus
+        memory.read(); // memory lê o valor do extbus e joga o endereço de salto para o extbus
         statusMemory.storeIn1(); // statusMemory armazena o valor de extbus1
         ula.inc(); // ula incrementa o valor
         ula.internalRead(1); // ula joga o valor para intbus2
@@ -1156,10 +1164,10 @@ public class Architecture {
 			jmpMem();
 			break;
 		case 6:
-			jzMem();
+			jnMem();
 			break;
 		case 7:
-			jnMem();
+			jzMem();
 			break;
 		case 8:
 			jeqRegRegMem();

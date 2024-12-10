@@ -347,7 +347,7 @@ public class TestArchitecture {
 	}
 	
 	@Test
-	public void testJmp() {
+	public void testJmpMem() {
 		Architecture arch = new Architecture();
 		//storing the number 10 in PC
 		arch.getIntbus2().put(10);
@@ -356,7 +356,12 @@ public class TestArchitecture {
 		//storing the number 25 in the memory, in the position just before that one adressed by PC
 		arch.getExtbus1().put(11); //the position is 11, once PC points to 10
 		arch.getMemory().store();
-		arch.getExtbus1().put(25);
+		arch.getExtbus1().put(15);
+		arch.getMemory().store();
+
+        arch.getExtbus1().put(15); //the position is 11, once PC points to 10
+		arch.getMemory().store();
+		arch.getExtbus1().put(17);
 		arch.getMemory().store();
 		
 		
@@ -364,18 +369,18 @@ public class TestArchitecture {
 		arch.getPC().read();
 		assertEquals(10, arch.getExtbus1().get());
 		
-		//now we can perform the jmp method. 
+		//now we can perform the jmpMem method. 
 		//we will move the the number 25 (stored in the 31th position in the memory) 
 		//into the PC
 		arch.jmpMem();
 		arch.getPC().internalRead();;
 		//the internalbus2 must contains the number 25
-		assertEquals(25, arch.getIntbus2().get());
+		assertEquals(17, arch.getIntbus2().get());
 
 	}
 	
 	@Test
-	public void testJz() {
+	public void testJzMem() {
 		Architecture arch = new Architecture();
 		
 		//storing the number 30 in PC
@@ -432,7 +437,7 @@ public class TestArchitecture {
 	}
 	
 	@Test
-	public void testJn() {
+	public void testJnMem() {
 		Architecture arch = new Architecture();
 		
 		//storing the number 30 in PC
@@ -488,6 +493,21 @@ public class TestArchitecture {
 		assertEquals(32, arch.getIntbus2().get());
 	}
 	
+    @Test
+    public void testeJeqRegRegMem(){
+        Architecture arch = new Architecture();
+        
+        //armazenando o numero 0, na posicao 31 da memoria
+        arch.getMemory().getDataList()[31] = 0;
+        //armazenando o numero 1, na posicao 32 da memoria
+        arch.getMemory().getDataList()[32] = 1;
+
+        //fazendo o PC apontar para a posicao 30
+        arch.getExtbus1().put(30);
+        arch.getPC().store();
+    }
+
+
 	@Test
 	public void testRead() {
 		Architecture arch = new Architecture();
@@ -682,9 +702,10 @@ public class TestArchitecture {
 		 * add %<regA> <addr>         -> addr <- rpg + regA
 		 * add <imm> %<regA>          -> rpg <- regA + imm
 		 * sub <addr>                 -> rpg <- rpg - addr
-		 * jmp <addr>                 -> pc <- addr
-		 * jz <addr>                  -> se bitZero, pc <- addr
-		 * jn <addr>                  -> se bitneg, pc <- addr
+		 * jmp <mem>                  -> pc <- mem  
+         * jn <mem>                   -> se bitNegative, pc <- mem          
+		 * jz <mem>                   -> se bitZero, pc <- mem
+         * jeq %<regA> %<regB> <mem>  -> se regA = regB, pc <- mem
 		 * read <addr>                -> rpg <- addr
 		 * store <addr>               -> addr <- rpg
 		 * ldi <x>                    -> rpg <- x
@@ -701,14 +722,15 @@ public class TestArchitecture {
 		assertTrue("addRegMem".equals(commands.get(2)));  // 2
 		assertTrue("addImmReg".equals(commands.get(3)));  // 3
 		assertTrue("sub".equals(commands.get(4)));        // 4
-		assertTrue("jmp".equals(commands.get(5)));        // 5
-		assertTrue("jz".equals(commands.get(6)));         // 6
-		assertTrue("jn".equals(commands.get(7)));         // 7
-		assertTrue("read".equals(commands.get(8)));       // 8
-		assertTrue("store".equals(commands.get(9)));      // 9
-		assertTrue("ldi".equals(commands.get(10)));       // 10
-		assertTrue("inc".equals(commands.get(11)));       // 11
-		assertTrue("moveRegReg".equals(commands.get(12))); // 12
+		assertTrue("jmpMem".equals(commands.get(5)));     // 5
+		assertTrue("jnMem".equals(commands.get(6)));      // 6
+		assertTrue("jzMem".equals(commands.get(7)));      // 7
+        assertTrue("jeqRegReg".equals(commands.get(8)));  // 8
+		assertTrue("read".equals(commands.get(9)));       // 8
+		assertTrue("store".equals(commands.get(10)));      // 10
+		assertTrue("ldi".equals(commands.get(11)));       // 11
+		assertTrue("inc".equals(commands.get(12)));       // 12
+		assertTrue("moveRegReg".equals(commands.get(13))); // 13
 	}
 	
 	@Test
