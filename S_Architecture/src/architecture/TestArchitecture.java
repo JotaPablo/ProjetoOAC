@@ -894,9 +894,9 @@ public class TestArchitecture {
 		assertTrue("ldi".equals(commands.get(13)));       // 13
 		assertTrue("inc".equals(commands.get(14)));       // 14
 		assertTrue("moveMemReg".equals(commands.get(15))); // 15
-		assertTrue("moveRegMem".equals(commands.get(15))); //16
-		assertTrue("moveRegReg".equals(commands.get(15))); //17
-		assertTrue("moveImmReg".equals(commands.get(15))); //18
+		assertTrue("moveRegMem".equals(commands.get(16))); //16
+		assertTrue("moveRegReg".equals(commands.get(17))); //17
+		assertTrue("moveImmReg".equals(commands.get(18))); //18
 	}
 	
 	@Test
