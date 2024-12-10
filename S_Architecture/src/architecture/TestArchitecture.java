@@ -367,7 +367,7 @@ public class TestArchitecture {
 		//now we can perform the jmp method. 
 		//we will move the the number 25 (stored in the 31th position in the memory) 
 		//into the PC
-		arch.jmp();
+		arch.jmpMem();
 		arch.getPC().internalRead();;
 		//the internalbus2 must contains the number 25
 		assertEquals(25, arch.getIntbus2().get());
@@ -388,7 +388,7 @@ public class TestArchitecture {
 		arch.getExtbus1().put(25);
 		arch.getMemory().store();
 
-		//now we can perform the jz method. 
+		//now we can perform the jzMem method. 
 
 		//CASE 1.
 		//Bit ZERO is equals to 1
@@ -401,7 +401,7 @@ public class TestArchitecture {
 		arch.getPC().read();
 		assertEquals(30, arch.getExtbus1().get());		
 
-		arch.jz();
+		arch.jzMem();
 		
 		//PC must be storing the number 25
 		arch.getPC().internalRead();
@@ -425,7 +425,7 @@ public class TestArchitecture {
 		//Once the ZERO bit is 0, we WILL NOT move the number 25 (stored in the 31th position in the memory)
 		//into the PC.
 		//The original PC position was 30. The parameter is in position 31. So, now PC must be pointing to 32
-		arch.jz();
+		arch.jzMem();
 		//PC contains the number 32
 		arch.getPC().internalRead();
 		assertEquals(32, arch.getIntbus2().get());
@@ -458,7 +458,7 @@ public class TestArchitecture {
 		arch.getPC().read();
 		assertEquals(30, arch.getExtbus1().get());		
 
-		arch.jn();
+		arch.jnMem();
 		
 		//PC must be storng the number 25
 		arch.getPC().internalRead();
@@ -482,7 +482,7 @@ public class TestArchitecture {
 		//Once the ZERO bit is 0, we WILL NOT move the number 25 (stored in the 31th position in the memory)
 		//into the PC.
 		//The original PC position was 30. The parameter is in position 31. So, now PC must be pointing to 32
-		arch.jn();
+		arch.jnMem();
 		//PC contains the number 32
 		arch.getPC().internalRead();
 		assertEquals(32, arch.getIntbus2().get());
