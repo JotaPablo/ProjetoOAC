@@ -732,9 +732,9 @@ public class Architecture {
      * Este método implementa o microprograma para
      *                      jmp mem
      * No código de máquina, este comando possui um número específico, e seu parâmetro está na posição seguinte:
-     * - O parâmetro é o endereço de memória para onde será feito o salto.
+     * - O parâmetro é o local de memoria onde está o endereço para onde será feito o salto.
      * 
-     * O método lê o endereço de memória na posição logo após o comando e redireciona o PC para este endereço, realizando um salto incondicional.
+     * O método lê o endereço que está no local de memoria e redireciona o PC para este endereço, realizando um salto incondicional.
      * 
      * A lógica é:
      * 1. pc -> intbus2                            // PC.internalRead()
@@ -743,8 +743,8 @@ public class Architecture {
      * 4. ula -> intbus2                           // ula.internalRead(1)
      * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o endereço de parâmetro)
      * 6. pc -> extbus1                             // PC.read() coloca o endereço de parâmetro no extbus1
-     * 7. memory.read()                             // memory.read() lê o endereço da posição de memoria onde está o endereço de salto
-     * 8. memory.read()                             // memory.read() lê o endereço de salto do extbus
+     * 7. memory.read()                             // memory.read() retorna endereço do local da memoria onde está contido o endereço de salto)
+     * 8. memory.read()                             // memory.read() retorna o endereço de salto do extbus
      * 9. PC.store()                                // PC.store() atualiza o PC com o endereço de salto
      * fim
      * 
@@ -755,7 +755,7 @@ public class Architecture {
 		ula.internalStore(1);
 		ula.inc();
 		ula.internalRead(1);
-		PC.internalStore(); //now PC points to the parameter address
+		PC.internalStore(); 
 		PC.read();
 		memory.read();
 		memory.read();
@@ -766,9 +766,9 @@ public class Architecture {
      * Este método implementa o microprograma para
      *                      jz mem
      * No código de máquina, este comando tem um número específico e seu parâmetro está na posição seguinte:
-     * - O parâmetro é o endereço de memória para onde será feito o salto caso o bit zero esteja setado.
+     * - O parâmetro é o local de memoria onde está contido o endereço  para onde será feito o salto caso o bit zero esteja setado.
      * 
-     * O método lê o endereço da memória, na posição logo após o comando, e redireciona o PC para este endereço caso o bit zero esteja setado. Caso contrário, o PC é atualizado para a próxima instrução.
+     * O método lê o endereço que está no local de memória e redireciona o PC para este endereço caso o bit zero esteja setado. Caso contrário, o PC é atualizado para a próxima instrução.
      * 
      * A lógica é:
      * 1. pc -> intbus2                            // PC.internalRead()
@@ -777,8 +777,8 @@ public class Architecture {
      * 4. ula -> intbus2                           // ula.internalRead(1)
      * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o parâmetro)
      * 6. pc -> extbus                             // PC.read()
-     * 7. memória -> extbus                        // memory.read() (posição da memoria onde está o endereço de salto)
-     * 9. memoria -> extbus                        // memory.read() (endereço de salto no extbus)
+     * 7. memória -> extbus                        // memory.read() (retorna o endereço do local da memoria onde está contido o endereço de salto))
+     * 9. memoria -> extbus                        // memory.read() (retorna o endereço de salto no extbus)
      * 10. statusMemory(1) <- extbus                // statusMemory.storeIn1()
      * 11. ula inc                                  // ula.inc()
      * 12. ula -> intbus2                          // ula.internalRead(1)
@@ -816,8 +816,7 @@ public class Architecture {
      *                      jn mem
      * No código de máquina, este comando tem um número específico e seu parâmetro está na posição seguinte:
      * - O parâmetro é o endereço de memória para onde será feito o salto caso o bit NEGATIVE esteja setado.
-     * 
-     * O método lê o endereço da memória, na posição logo após o comando, e redireciona o PC para este endereço caso o bit NEGATIVE esteja setado. Caso contrário, o PC é atualizado para a próxima instrução.
+     O método lê o endereço que está no local de memória, e redireciona o PC para este endereço caso o bit NEGATIVE esteja setado. Caso contrário, o PC é atualizado para a próxima instrução.
      * 
      * A lógica é:
      * 1. pc -> intbus2                            // PC.internalRead()
@@ -826,8 +825,8 @@ public class Architecture {
      * 4. ula -> intbus2                           // ula.internalRead(1)
      * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o parâmetro)
      * 6. pc -> extbus                             // PC.read()
-     * 7. memória -> extbus                        // memory.read() (posição da memoria onde está o endereço de salto)
-     * 8. memória -> extbus                        // memory.read() (endereço de salto no extbus)
+     * 7. memória -> extbus                        // memory.read() (retorna o endereço do local da memoria onde está contido o endereço de salto))
+     * 8. memória -> extbus                        // memory.read() (retorna o endereço de salto no extbus)
      * 8. statusMemory(1) <- extbus                // statusMemory.storeIn1()
      * 9. ula inc                                  // ula.inc()
      * 10. ula -> intbus2                          // ula.internalRead(1)
@@ -869,7 +868,7 @@ public class Architecture {
  * - O terceiro parâmetro é o endereço de memória para onde será feito o salto caso os registradores sejam iguais.
  * 
  * O método lê os IDs dos dois registradores da memória, nas posições logo após o comando, e realiza uma comparação entre os valores contidos nesses registradores.
- * Se os valores forem iguais (flag ZERO setado), o programa salta para o endereço especificado. Caso contrário, continua para a próxima instrução.
+ * Se os valores forem iguais (flag ZERO setado), o programa salta para o endereço contido no local de memoria especificado. Caso contrário, continua para a próxima instrução.
  * 
  * A lógica é:
  * 1. pc -> intbus2                            // PC.internalRead()
@@ -902,8 +901,8 @@ public class Architecture {
  * 25. ula -> intbus2                          // ula.internalRead(1)
  * 26. pc <- intbus2                           // PC.internalStore() (PC aponta para o terceiro parâmetro)
  * 27. pc -> extbus                            // PC.read()
- * 28. memória -> extbus                       // memory.read() (posição de memória onde está o endereço de salto)
- * 29. memória -> extbus                       // memory.read() (endereço de salto no extbus)
+ * 28. memória -> extbus                       // memory.read() (retorna o local da memoria onde está contido o endereço de salto))
+ * 29. memória -> extbus                       // memory.read() (retorna o endereço de salto no extbus)
  * 30. statusMemory(1) <- extbus               // statusMemory.storeIn1()
 
  * 31. ula inc                                 // ula.inc()
