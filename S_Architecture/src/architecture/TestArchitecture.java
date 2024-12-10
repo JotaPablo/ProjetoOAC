@@ -697,6 +697,160 @@ public class TestArchitecture {
 		//PC was pointing to 30; now it must be pointing to 33
 		arch.getPC().read();assertEquals(33, arch.getExtbus1().get());
 	}
+
+	@Test
+	public void testincAlternativo() {
+		Architecture arch = new Architecture();
+
+		// Armazenando na pos31 da memória 0 que e o reg
+		arch.getMemory().getDataList()[31] = 0;
+
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getIntbus1().put(3);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 3
+
+		// Executando o comando move reg
+		arch.incAlternativo();
+
+		// Testando se o reg0 incrementou
+		arch.getRegistersList().get(0).read();
+		assertEquals(4, arch.getIntbus1().get());
+
+		// Testando se o PC aponta para 2 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 32
+		arch.getPC().read();
+		assertEquals(32, arch.getExtbus1().get());
+	}
+
+	@Test
+	public void testMoveRegRegAlternativo() {
+		Architecture arch = new Architecture();
+
+		// Armazenando na pos31 da memória 1 (regA)
+		arch.getMemory().getDataList()[31] = 1;
+		// Armazenando na pos32 da memória 0 (regB)
+		arch.getMemory().getDataList()[32] = 0;
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getIntbus1().put(30);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 30
+		arch.getIntbus1().put(10);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 10
+
+		// Executando o comando move reg
+		arch.moveRegRegAlternativo();
+
+		// Testando se tanto reg1 e reg0 ta armazenando 10
+		arch.getRegistersList().get(0).read();
+		assertEquals(10, arch.getIntbus1().get());
+		arch.getRegistersList().get(1).read();
+		assertEquals(10, arch.getIntbus1().get());
+
+		// Testando se o PC aponta para 3 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 33
+		arch.getPC().read();
+		assertEquals(33, arch.getExtbus1().get());
+	}
+
+	@Test
+	public void testMoveMemReg() {
+		Architecture arch = new Architecture();
+
+		// Armazenando o número 1 na memória, na posição 31
+		arch.getMemory().getDataList()[31] = 37;
+		// Armazenando o número 0 na memória, na posição 32
+		arch.getMemory().getDataList()[32] = 0;
+		// Armazenando o número 1 na posição 37 da memória
+		arch.getMemory().getDataList()[37] = 1;
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getIntbus1().put(45);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 45
+
+		// Executando o comando move mem reg0
+		arch.moveMemReg();
+
+		// Testando se tanto REG1 ta armazenando 1
+		arch.getRegistersList().get(0).read();
+		assertEquals(1, arch.getIntbus1().get());
+
+		// Testando se o PC aponta para 3 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 33
+		arch.getPC().read();
+		assertEquals(33, arch.getExtbus1().get());
+	}
+
+	@Test
+	public void testMoveRegMem() {
+		Architecture arch = new Architecture();
+
+		// Armazenando o número 1 na memória, na posição 31
+		arch.getMemory().getDataList()[31] = 0;
+		// Armazenando o número 0 na memória, na posição 32
+		arch.getMemory().getDataList()[32] = 37;
+		// Armazenando o número 1 na posição 37 da memória
+		arch.getMemory().getDataList()[37] = 15;
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getIntbus1().put(1);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 1
+
+		// Executando o comando move mem reg0
+		arch.moveRegMem();
+
+		// Testando se mem[37] ta armazenando 1
+		arch.getExtbus1().put(37);
+	    arch.getMemory().read();
+	    assertEquals(1, arch.getExtbus1().get());
+
+		// Testando se o PC aponta para 3 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 33
+		arch.getPC().read();
+		assertEquals(33, arch.getExtbus1().get());
+	}
+
+	@Test
+	public void testMoveImmReg() {
+		Architecture arch = new Architecture();
+
+		// Armazenando o número 1 na memória, na posição 31
+		arch.getMemory().getDataList()[31] = 1;
+		// Armazenando o número 0 na memória, na posição 32
+		arch.getMemory().getDataList()[32] = 0;
+		// Fazendo o PC apontar para a posição 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Agora configurando os valores dos registradores
+		arch.getIntbus1().put(31);
+		arch.getRegistersList().get(0).store(); // RPG0 possui 31
+
+		// Executando o comando move mem reg0
+		arch.moveImmReg();
+
+		// Testando se mem[37] ta armazenando 1
+		arch.getExtbus1().put(37);
+	    arch.getMemory().read();
+	    assertEquals(1, arch.getExtbus1().get());
+
+		// Testando se o PC aponta para 3 posições após o original
+		// O PC estava apontando para 30; agora deve estar apontando para 33
+		arch.getPC().read();
+		assertEquals(33, arch.getExtbus1().get());
+	}
 		
 	
 	@Test
@@ -739,7 +893,10 @@ public class TestArchitecture {
 		assertTrue("store".equals(commands.get(12)));      // 12
 		assertTrue("ldi".equals(commands.get(13)));       // 13
 		assertTrue("inc".equals(commands.get(14)));       // 14
-		assertTrue("moveRegReg".equals(commands.get(15))); // 15
+		assertTrue("moveMemReg".equals(commands.get(15))); // 15
+		assertTrue("moveRegMem".equals(commands.get(15))); //16
+		assertTrue("moveRegReg".equals(commands.get(15))); //17
+		assertTrue("moveImmReg".equals(commands.get(15))); //18
 	}
 	
 	@Test

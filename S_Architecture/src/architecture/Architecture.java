@@ -192,7 +192,10 @@ public class Architecture {
 		commandsList.add("store"); //12
 		commandsList.add("ldi");   //13
 		commandsList.add("inc");   //14	
-		commandsList.add("moveRegReg"); //15
+		commandsList.add("moveMemReg"); //15
+		commandsList.add("moveRegMem"); //16
+		commandsList.add("moveRegReg"); //17
+		commandsList.add("moveImmReg"); //18
 	}
 
 	
@@ -1028,7 +1031,7 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
 	}
-	
+
 	/**
 	 * This method implements the microprogram for
 	 * 					move <reg1> <reg2> 
@@ -1087,7 +1090,158 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
 	}
+
+	public void incAlternativo(){ //estou fazendo na dúvida,vai que o
+								// do professor nao funciona ou ele cobra
+		//pc++					
+		PC.internalRead(); 
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		//pegando na memória
+		memory.read() //agora ta no exitbus
+		demux.setValue(extbus1.get());
+		registersInternalRead(); //dado ta no intbus2
+		ula.internalStore(1);
+		ula.incAlternativo();
+		ula.internalRead(1);
+		setStatusFlags(intbus2.get()); //atualiza flags
+		registersInternalStore(); //guarda no rpg
+		//pc++
+		PC.internalRead(); 
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); 
+	}
+
+	public void moveRegRegAlternativo() { //mesmo motivo do de cima
+		//pc++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		//pegar o primeiro reg
+		PC.read(); 
+		memory.read(); //o rpg ta no exitbus
+		//pc++ para apontar pro prox parametro
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); //agora ta apontando
+		
+		demux.setValue(extbus1.get()); //pega o rpg correto
+		registersInternalRead(); //guarda o dado do rpgA no intbus2
+		//pegando o rpgB
+		PC.read();
+		memory.read(); // extbus
+		demux.setValue(extbus1.get());//agora o demux ta no rpgB
+		registersInternalStore(); //guarda o dado que tava no intbus2 no rpgB
+		//pc++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
 	
+	public void moveMemReg(){
+		//pc++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		//pegando o dado
+		PC.read(); 
+		memory.read(); //extbus tem o ponteiro
+		memory.read(); //agora o dado em si
+		IR.store(); // o dado de mem ta no IR
+		//pc++ pra pegar o reg
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		
+		IR.internalRead(); //agora o dado ta no intbus2
+		pc.read();
+		memory.read(); //agora reg ta no extbus
+		demux.setValue(extbus1.get()); //agora vai ler pro reg
+		registersInternalRead(); //o dado de intbus2 vai pro reg
+		//pc++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
+
+	public void moveRegMem(){
+		//pc++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		//pegando o dado
+		PC.read(); 
+		memory.read(); //extbus tem o reg
+		demux.setValue(extbus1.get()); //agora vai ler pro reg
+		//pc++ pra ir pra memoria
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		registersInternalRead(); //o dado do rpg ta no intbus2
+		IR.internalStore();//o dado do rpg ta no IR
+		//escrevendo na memoria
+		pc.read();
+		memory.read(); //ta o endereço
+		memory.store(); //agora vai ficar esperando o valor
+		IR.read();
+		memory.store();
+		//pc++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
+
+	public void moveImmReg(){
+		//pc++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		//pegando o dado
+		PC.read(); 
+		memory.read(); //extbus tem o dado
+		IR.store();
+		//pc++ pra pegar o reg
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		//pegando o reg
+		pc.read();
+		memory.read();
+		demux.setValue(extbus1.get());//agora vai pro rpg certo
+		IR.internalRead(); //vai pro intbus2
+		registersInternalStore();
+		//pc++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
 	
 	public ArrayList<Register> getRegistersList() {
 		return registersList;
