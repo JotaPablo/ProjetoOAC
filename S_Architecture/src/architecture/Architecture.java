@@ -193,6 +193,11 @@ public class Architecture {
 		commandsList.add("ldi");   //13
 		commandsList.add("inc");   //14	
 		commandsList.add("moveRegReg"); //15
+		commandsList.add("jneq"); //18
+		commandsList.add("jgt"); //19
+		commandsList.add("jlw"); //20
+		commandsList.add("call"); //21
+		commandsList.add("ret"); //22
 	}
 
 	
@@ -1088,6 +1093,310 @@ public class Architecture {
 		PC.internalStore(); //now PC points to the next instruction. We go back to the FETCH status.
 	}
 	
+	//Move
+	//Move
+	//Move
+	//Inc
+	//Jmp
+	//Jn
+	//Jz
+	//Jnz
+	
+	/**	
+	 * This method implements the microprogram for
+	 * jneq %<regA> %<regB> <mem>   || se RegA!=RegB então PC <- mem (desvio condiciona
+	 * 
+	 * 
+	 * In the machine language this command number is 18, the first register is in the position next to him, the second register is in the position next to the first register and the address is in the position next to the second register
+	 * 
+	 *
+	 */
+	public void jneq() {
+		// 1. Ler o PC atual para buscar o primeiro parâmetro (RegA)
+		PC.internalRead(); 
+		ula.internalStore(1); // Armazena o PC na ULA
+		ula.inc(); // Incrementa o PC para o próximo endereço
+		ula.internalRead(1); 
+		PC.internalStore(); // Atualiza o PC para o endereço do primeiro parâmetro (RegA)
+		
+		// 2. Ler o primeiro registrador (RegA)
+		PC.read(); 
+		memory.read(); // Lê o identificador de RegA da memória para o barramento externo
+		demux.setValue(extbus1.get()); // Decodifica e aponta para RegA
+		registersInternalRead(); // Lê o valor de RegA e armazena internamente (ULA posição 0)
+		ula.internalStore(0);
+
+		// 3. Incrementar o PC para o próximo parâmetro (RegB)
+		PC.internalRead(); 
+		ula.internalStore(1);
+		ula.inc(); 
+		ula.internalRead(1);
+		PC.internalStore(); // Atualiza o PC para o endereço do segundo parâmetro (RegB)
+		
+		// 4. Ler o segundo registrador (RegB)
+		PC.read();
+		memory.read(); // Lê o identificador de RegB da memória para o barramento externo
+		demux.setValue(extbus1.get()); // Decodifica e aponta para RegB
+		registersInternalRead(); // Lê o valor de RegB e armazena internamente (ULA posição 1)
+		ula.internalStore(1);
+
+		// 5. Comparar RegA e RegB
+		ula.sub(); // Subtrai RegA de RegB
+		ula.internalRead(1); // Lê o resultado da subtração
+		setStatusFlags(intbus2.get()); // Atualiza as flags de acordo com o resultado da subtração
+
+		// 6. Atualizar o PC para a próxima instrução
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); // Atualiza o PC para a próxima instrução
+		
+		// 7. Ler o endereço de desvio da memória
+		PC.read();
+		memory.read(); // Lê o endereço de desvio da memória para o barramento externo
+		statusMemory.storeIn0(); // Armazena o endereço de desvio na posição 0 da memória de status
+
+		// 8. Atualizar o PC para a próxima instrução
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore(); // Atualiza o PC para a próxima instrução
+		PC.read(); // PC -> extbus1
+		statusMemory.storeIn1(); // Armazena o endereço da próxima instrução na posição 1 da memória de status
+		
+		// Check if RegA != RegB (result is not zero)
+		extbus1.put(Flags.getBit(0)); // Get ZERO flag
+		statusMemory.read(); // Get jump address based on flag
+		PC.store(); // Update PC
+		}
+
+	/**
+	 * This method implements the microprogram for
+	 * jgt %<regA> %<regB> <mem>   || se RegA>RegB então PC <- mem (desvio condicional)
+	 * 
+	 * In the machine language this command number is 19
+	 * Similar to jneq, but checks if RegA > RegB
+	 * When ula.sub() executes RegA - RegB:
+	 * - If result is positive (not zero and not negative), then RegA > RegB
+	 * - Otherwise, RegA <= RegB
+	 */
+	public void jgt() {
+		// 1. Get first parameter (RegA)
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// 2. Read RegA value
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.internalStore(0);
+
+		// 3. Get second parameter (RegB)  
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// 4. Read RegB value
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.internalStore(1);
+
+		// 5. Compare RegA and RegB
+		ula.sub();
+		ula.internalRead(1);
+		setStatusFlags(intbus2.get());
+
+		// 6. Get jump address
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		memory.read();
+		statusMemory.storeIn0();
+
+		// 7. Get next instruction address
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		statusMemory.storeIn1();
+
+		// 8. Jump if result is positive: not zero AND not negative
+		extbus1.put(Flags.getBit(1)); // Get ZERO flag
+		IR.store(); // Use IR to move ZERO flag to ULA
+		IR.internalRead(); 
+		ula.internalStore(1); 
+		extbus1.put(Flags.getBit(0)); // Get NEGATIVE flag
+		IR.store(); // Use IR to move NEGATIVE flag to ULA
+		IR.internalRead(); 
+		ula.internalStore(0); 
+		ula.add(); // Check if result is positive (bit 0 = 0 and bit 1 = 0)
+		ula.internalRead(1); 
+		IR.internalStore();
+		IR.read(); // Move the result of ula.add to extbus1
+		
+		statusMemory.read();
+		PC.store();
+	}
+
+	/**
+	 * This method implements the microprogram for
+	 * jlw %<regA> %<regB> <mem>   || se RegA<RegB então PC <- mem (desvio condicional)
+	 * 
+	 * In the machine language this command number is 20
+	 * Similar to jgt, but checks if RegA < RegB
+	 * When ula.sub() executes RegA - RegB:
+	 * - If result is negative (negative flag is 1), then RegA < RegB
+	 * - Otherwise, RegA >= RegB
+	 */
+	public void jlw() {
+		// 1. Get first parameter (RegA)
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// 2. Read RegA value
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.internalStore(0);
+
+		// 3. Get second parameter (RegB)
+		PC.internalRead();
+		ula.internalStore(1); 
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		
+		// 4. Read RegB value
+		PC.read();
+		memory.read();
+		demux.setValue(extbus1.get());
+		registersInternalRead();
+		ula.internalStore(1);
+
+		// 5. Compare RegA and RegB
+		ula.sub();
+		ula.internalRead(1);
+		setStatusFlags(intbus2.get());
+
+		// 6. Get jump address
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		memory.read();
+		statusMemory.storeIn1();
+
+		// 7. Get next instruction address
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		PC.read();
+		statusMemory.storeIn0();
+
+		// 8. Jump if RegA < RegB (result is negative)
+		extbus1.put(Flags.getBit(1));
+		statusMemory.read();
+		PC.store();
+	}
+	
+	/**
+	 * This method implements the microprogram for
+	 * 					call address
+	 * In the machine language this command number is 21, and the address is in the position next to him
+	 *    
+	 * where address is a valid position in this memory architecture (where the PC is redirecto to)
+	 * The method reads the value from memory (position address),
+	 * inserts it into the PC register.
+	 * Store the next PC value in mem[stktop] and
+	 * Decrease stktop
+	*/
+	public void call() {
+		
+		// 1. Get the parameter (adress)
+				PC.internalRead(); 
+				ula.internalStore(1); 
+				ula.inc();
+				ula.internalRead(1);
+				PC.internalStore();
+		//2. Store that value in Pc
+				PC.read(); 
+				memory.read();
+				PC.store();
+		//3. Store the supossed next PC value in memory[StkTop]
+				ula.inc(); 
+				ula.internalRead(1); 
+				IR.internalStore();
+				StkTOP.read();
+				memory.store();
+				IR.read();
+				memory.store();
+		//4. Decrease StkTOP
+				StkTOP.read(); //StkTOP coloca o valor no barramento
+				IR.store();
+				IR.internalRead();
+				ula.internalStore(1);
+				ula.inc();
+				ula.internalStore(0);
+				ula.sub(); // 1 <- 0 - 1
+				ula.add();
+				ula.internalRead(1);
+				IR.internalStore();
+				IR.read();
+				StkTOP.store();		
+	}
+	
+	/**
+	 * This method implements the microprogram for
+	 * 					ret
+	 * In the machine language this command number is 22
+	 *    
+	 * 
+	 * The method:
+	 * increase stktop
+	 * reads the value from memory (stktop value),
+	 * inserts it into the PC register.
+	*/
+	
+	public void ret() {
+		
+		StkTOP.read();
+		IR.store();	
+		IR.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		IR.internalStore();
+		IR.read();
+		StkTOP.store();
+		memory.read();
+		PC.store();
+	}
+	
+	
+	
+	
 	
 	public ArrayList<Register> getRegistersList() {
 		return registersList;
@@ -1220,6 +1529,21 @@ public class Architecture {
 			break;
 		case 15:
 			moveRegReg();
+			break;
+		case 18:
+			jneq();
+			break;
+		case 19:
+			jgt();
+			break;
+		case 20:
+			jlw();
+			break;
+		case 21:
+			//call();
+			break;
+		case 22:
+			//ret();
 			break;
 		default:
 			halt = true;

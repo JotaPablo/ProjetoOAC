@@ -328,7 +328,7 @@ public class testAssembler {
 		sourceProgram.add("add %RPG0 %RPG1");
 		sourceProgram.add("store var1");
 		sourceProgram.add("move %RPG1 %RPG0");
-		sourceProgram.add("sub var3");
+		sourceProgram.add("sub var3 %RPG0");
 		sourceProgram.add("jn label");
 		
 		//now we can generate the object program
@@ -338,7 +338,7 @@ public class testAssembler {
 		//System.out.println(returnedObj);
 		
 		//teste
-		assertEquals(26, returnedObj.size()); // Verifica o tamanho do programa gerado
+		assertEquals(27, returnedObj.size()); // Verifica o tamanho do programa gerado
 
 		//checando linha por linha
 		assertEquals("10", returnedObj.get(0)); // ldi 10

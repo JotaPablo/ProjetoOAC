@@ -144,6 +144,7 @@ public class Assembler {
 		String command = tokens[0];
 		String parameter ="";
 		String parameter2 = "";
+		String parameter3 = "";
 		int commandNumber = findCommandNumber(tokens);
 		if (commandNumber == 0) { //must to proccess an add Reg Reg command
 			parameter = tokens[1];
@@ -211,12 +212,32 @@ public class Assembler {
 			parameter = tokens[1];
 			parameter2 = tokens[2];
 		}
+		if (commandNumber == 18) { //must to proccess an jneq command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter = "&"+parameter; //this is a flag to indicate that is a position in memory
+
+		}
+		if (commandNumber == 19) { //must to proccess an jgt command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter2 = "&"+parameter2; //this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 20) { //must to proccess an jlw command
+			parameter = tokens[1];
+			parameter2 = tokens[2];
+			parameter2 = "&"+parameter2; //this is a flag to indicate that is a position in memory
+		}
+		
 		objProgram.add(Integer.toString(commandNumber));
 		if (!parameter.isEmpty()) {
 			objProgram.add(parameter);
 		}
 		if (!parameter2.isEmpty()) {
 			objProgram.add(parameter2);
+		}
+		if (!parameter3.isEmpty()) {
+			objProgram.add(parameter3);
 		}
 	}
 	

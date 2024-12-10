@@ -697,6 +697,260 @@ public class TestArchitecture {
 		//PC was pointing to 30; now it must be pointing to 33
 		arch.getPC().read();assertEquals(33, arch.getExtbus1().get());
 	}
+	
+	@Test
+	public void testJneq() { //Test for public void jneq()
+		Architecture arch = new Architecture(); //jneq %<regA> %<regB> <mem>   || se RegA!=RegB então PC <- mem (desvio condicional)
+
+		// Setup memory values
+		arch.getMemory().getDataList()[31] = 0;  // First register ID
+		arch.getMemory().getDataList()[32] = 1;  // Second register ID
+		arch.getMemory().getDataList()[33] = 100;  // Jump address
+	
+		// Initialize PC to position 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+	
+		// Test Case 1: Different Values (Should Jump)
+		// Set registers with different values
+		arch.getIntbus1().put(1);
+		arch.getRegistersList().get(0).store(); // RPG0 = 1
+		arch.getIntbus1().put(2);
+		arch.getRegistersList().get(1).store(); // RPG1 = 2
+	
+		arch.jneq();
+	
+		// Verify registers maintain their values
+		arch.getRegistersList().get(0).read();
+		assertEquals(1, arch.getIntbus1().get());
+		arch.getRegistersList().get(1).read();
+		assertEquals(2, arch.getIntbus1().get());
+	
+		// Verify PC jumped to address 100
+		arch.getPC().read();
+		assertEquals(100, arch.getExtbus1().get());
+	
+		// Test Case 2: Equal Values (Should Not Jump)
+		// Reset PC
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+	
+		// Set registers with same value
+		arch.getIntbus1().put(5);
+		arch.getRegistersList().get(0).store(); // RPG0 = 5
+		arch.getRegistersList().get(1).store(); // RPG1 = 5
+	
+		arch.jneq();
+	
+		// Verify registers maintain their values
+		arch.getRegistersList().get(0).read();
+		assertEquals(5, arch.getIntbus1().get());
+		arch.getRegistersList().get(1).read();
+		assertEquals(5, arch.getIntbus1().get());
+	
+		// Verify PC points to next instruction (34) instead of jumping
+		arch.getPC().read();
+		assertEquals(34, arch.getExtbus1().get());
+	
+		// Verify flags
+		assertEquals(1, arch.getFlags().getBit(0)); // Zero flag should be set for equal values
+		assertEquals(0, arch.getFlags().getBit(1)); // Negative flag should be clear
+	}
+	
+	@Test
+	public void testJgt() {
+		Architecture arch = new Architecture();
+
+		// Setup memory values
+		arch.getMemory().getDataList()[31] = 0;  // First register ID
+		arch.getMemory().getDataList()[32] = 1;  // Second register ID
+		arch.getMemory().getDataList()[33] = 100;  // Jump address
+
+		// Initialize PC to position 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Test Case 1: RegA < RegB (Should not Jump)
+		arch.getIntbus1().put(1);
+		arch.getRegistersList().get(0).store(); // RPG0 = 1
+		arch.getIntbus1().put(2); 
+		arch.getRegistersList().get(1).store(); // RPG1 = 2
+
+		arch.jgt();
+
+		// Verify registers maintain their values
+		arch.getRegistersList().get(0).read();
+		assertEquals(1, arch.getIntbus1().get());
+		arch.getRegistersList().get(1).read();
+		assertEquals(2, arch.getIntbus1().get());
+
+		// Verify PC points to next instruction (34) instead of jumping
+
+		// Verify PC jumped to address 34
+		arch.getPC().read();
+		assertEquals(34, arch.getExtbus1().get());
+
+		// Test Case 2: RegA > RegB (Should Jump)
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		arch.getIntbus1().put(2);
+		arch.getRegistersList().get(0).store(); // RPG0 = 2
+		arch.getIntbus1().put(1);
+		arch.getRegistersList().get(1).store(); // RPG1 = 1
+
+		arch.jgt();
+
+		// Verify PC jumped to address 100
+		arch.getPC().read();
+		assertEquals(100, arch.getExtbus1().get());
+
+		// Test Case 3: RegA = RegB (Should Not Jump) 
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		arch.getIntbus1().put(5);
+		arch.getRegistersList().get(0).store(); // RPG0 = 5
+		arch.getRegistersList().get(1).store(); // RPG1 = 5
+
+		arch.jgt();
+
+		// Verify PC points to next instruction (34)
+		arch.getPC().read(); 
+		assertEquals(34, arch.getExtbus1().get());
+	}
+	
+	@Test
+	public void testJlw() {
+		Architecture arch = new Architecture();
+
+		// Setup memory values
+		arch.getMemory().getDataList()[31] = 0;  // First register ID
+		arch.getMemory().getDataList()[32] = 1;  // Second register ID
+		arch.getMemory().getDataList()[33] = 100;  // Jump address
+
+		// Initialize PC to position 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		// Test Case 1: RegA < RegB (Should Jump)
+		arch.getIntbus1().put(1);
+		arch.getRegistersList().get(0).store(); // RPG0 = 1
+		arch.getIntbus1().put(2);
+		arch.getRegistersList().get(1).store(); // RPG1 = 2
+
+		arch.jlw();
+
+		// Verify registers maintain their values
+		arch.getRegistersList().get(0).read();
+		assertEquals(1, arch.getIntbus1().get());
+		arch.getRegistersList().get(1).read();
+		assertEquals(2, arch.getIntbus1().get());
+
+		// Verify PC jumped to address 100
+		arch.getPC().read();
+		assertEquals(100, arch.getExtbus1().get());
+
+		// Test Case 2: RegA > RegB (Should Not Jump)
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		arch.getIntbus1().put(7);
+		arch.getRegistersList().get(0).store(); // RPG0 = 7
+		arch.getIntbus1().put(3);
+		arch.getRegistersList().get(1).store(); // RPG1 = 3
+
+		arch.jlw();
+
+		// Verify PC points to next instruction (34) instead of jumping
+		arch.getPC().read();
+		assertEquals(34, arch.getExtbus1().get());
+
+		// Test Case 3: RegA = RegB (Should Not Jump)
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+		arch.getIntbus1().put(5);
+		arch.getRegistersList().get(0).store(); // RPG0 = 5
+		arch.getRegistersList().get(1).store(); // RPG1 = 5
+
+		arch.jlw();
+
+		// Verify PC points to next instruction (34)
+		arch.getPC().read();
+		assertEquals(34, arch.getExtbus1().get());
+	}
+	
+	@Test
+	
+	public void  testCall() {
+		
+		Architecture arch = new Architecture();
+
+		
+	// Setup memory values
+		arch.getMemory().getDataList()[31] = 100;  // call address
+			
+	// Initialize PC to position 30
+		arch.getExtbus1().put(30);
+		arch.getPC().store();
+
+	
+	//Initialize stkTop(4) and stkBot(5) value in 125
+		arch.getExtbus1().put(125);
+		arch.getRegistersList().get(4).store();
+		arch.getRegistersList().get(5).store();
+	
+	arch.call();
+	
+	// Verify PC called to address 100
+		arch.getPC().read();
+		assertEquals(100, arch.getExtbus1().get());
+	// Verify if StkBot remains 125
+		 arch.getRegistersList().get(5).read();
+		 assertEquals(125, arch.getExtbus1().get());
+	// Verify if StkTOP is 124
+		 arch.getRegistersList().get(4).read();
+		 assertEquals(124, arch.getExtbus1().get());
+			
+	//Verify if 32 is in memory[125]
+	arch.getExtbus1().put(125);
+    arch.getMemory().read();
+    assertEquals(32, arch.getExtbus1().get());
+			
+	}
+	
+	@Test
+	public void testRet() {
+		
+		Architecture arch = new Architecture();
+
+		
+		// Setup memory values
+			arch.getMemory().getDataList()[125] = 32;  // call address
+			
+		//Initialize stkTop(4) value in 124 and stkBot(5) value in 125
+			arch.getExtbus1().put(124);
+			arch.getRegistersList().get(4).store();
+			arch.getExtbus1().put(125);
+			arch.getRegistersList().get(5).store();
+		
+		// Initialize PC to position 100
+			arch.getExtbus1().put(100);
+			arch.getPC().store();
+		
+		arch.ret();
+		
+		// Verify PC called to address 32
+				arch.getPC().read();
+		// Verify if StkBot remains 125
+				arch.getRegistersList().get(5).read();
+		// Verify if StkTOP is 125
+				 arch.getRegistersList().get(4).read();
+				 assertEquals(124, arch.getExtbus1().get());
+	}
+			
+			
 		
 	
 	@Test
@@ -720,6 +974,7 @@ public class TestArchitecture {
 		 * move %<regA> %<regB>       -> regA <- regB
 		 */
 
+		
 		
 		Architecture arch = new Architecture();
 		ArrayList<String> commands = arch.getCommandsList();
