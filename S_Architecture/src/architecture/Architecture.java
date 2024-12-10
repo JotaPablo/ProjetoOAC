@@ -149,6 +149,14 @@ public class Architecture {
 		return ula;
 	}
 
+	protected Register getStkTOP() {
+		return StkTOP;
+	}
+
+	protected Register getStkBOT() {
+		return StkBOT;
+	}
+
 	public ArrayList<String> getCommandsList() {
 		return commandsList;
 	}
@@ -196,6 +204,7 @@ public class Architecture {
 		commandsList.add("moveRegMem"); //16
 		commandsList.add("moveRegReg"); //17
 		commandsList.add("moveImmReg"); //18
+		commandsList.add("startStk"); //19
 	}
 
 	
@@ -1242,6 +1251,26 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore();
 	}
+
+	void startStk(){
+		//pc ++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+		//lendo da memoria e guardando nos stks
+		PC.read();
+		memory.read();
+		StkBOT.store();
+		StkTOP.store();
+		//pc ++
+		PC.internalRead();
+		ula.internalStore(1);
+		ula.inc();
+		ula.internalRead(1);
+		PC.internalStore();
+	}
 	
 	public ArrayList<Register> getRegistersList() {
 		return registersList;
@@ -1383,6 +1412,9 @@ public class Architecture {
 			break;
 		case 18:
 			moveImmReg();
+			break;
+		case 19:
+			startStk();
 			break;
 		default:
 			halt = true;
