@@ -215,18 +215,28 @@ public class Assembler {
 		if (commandNumber == 18) { //must to proccess an jneq command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
-			parameter = "&"+parameter; //this is a flag to indicate that is a position in memory
+			parameter3 = tokens[3];
+			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
 
 		}
 		if (commandNumber == 19) { //must to proccess an jgt command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
-			parameter2 = "&"+parameter2; //this is a flag to indicate that is a position in memory
+			parameter3 = tokens[3];
+			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
 		}
 		if (commandNumber == 20) { //must to proccess an jlw command
 			parameter = tokens[1];
 			parameter2 = tokens[2];
-			parameter2 = "&"+parameter2; //this is a flag to indicate that is a position in memory
+			parameter3 = tokens[3];
+			parameter3 = "&"+parameter3; //this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 21) { //must to proccess an call command
+			parameter = tokens[1];
+			parameter = "&"+parameter;//this is a flag to indicate that is a position in memory
+		}
+		if (commandNumber == 22) { //must to proccess an ret command (doesnt have any parameter)
+			
 		}
 		
 		objProgram.add(Integer.toString(commandNumber));
