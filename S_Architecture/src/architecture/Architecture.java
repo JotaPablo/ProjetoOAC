@@ -1100,11 +1100,11 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore();
 		//pegando na memória
-		memory.read() //agora ta no exitbus
+		memory.read(); //agora ta no exitbus
 		demux.setValue(extbus1.get());
 		registersInternalRead(); //dado ta no intbus2
 		ula.internalStore(1);
-		ula.incAlternativo();
+		ula.inc();
 		ula.internalRead(1);
 		setStatusFlags(intbus2.get()); //atualiza flags
 		registersInternalStore(); //guarda no rpg
@@ -1167,7 +1167,7 @@ public class Architecture {
 		ula.internalRead(1);
 		
 		IR.internalRead(); //agora o dado ta no intbus2
-		pc.read();
+		PC.read();
 		memory.read(); //agora reg ta no extbus
 		demux.setValue(extbus1.get()); //agora vai ler pro reg
 		registersInternalRead(); //o dado de intbus2 vai pro reg
@@ -1199,7 +1199,7 @@ public class Architecture {
 		registersInternalRead(); //o dado do rpg ta no intbus2
 		IR.internalStore();//o dado do rpg ta no IR
 		//escrevendo na memoria
-		pc.read();
+		PC.read();
 		memory.read(); //ta o endereço
 		memory.store(); //agora vai ficar esperando o valor
 		IR.read();
@@ -1230,7 +1230,7 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore();
 		//pegando o reg
-		pc.read();
+		PC.read();
 		memory.read();
 		demux.setValue(extbus1.get());//agora vai pro rpg certo
 		IR.internalRead(); //vai pro intbus2
@@ -1373,7 +1373,16 @@ public class Architecture {
 			inc();
 			break;
 		case 15:
+			moveMemReg();
+			break;
+		case 16:
+			moveRegMem();
+			break;
+		case 17:
 			moveRegReg();
+			break;
+		case 18:
+			moveImmReg();
 			break;
 		default:
 			halt = true;
