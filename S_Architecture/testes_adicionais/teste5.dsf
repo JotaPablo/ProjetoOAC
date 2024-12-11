@@ -1,0 +1,14 @@
+jmp main
+retorna:
+ret
+soma:
+inc %RPG0
+jlw %RPG0 %RPG1 chamasoma
+ret
+chamasoma:
+call soma
+ret
+main:
+move 1 %RPG0
+move 10 %RPG1
+call chamasoma

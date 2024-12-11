@@ -790,7 +790,7 @@ public class Architecture {
 		
 		demux.setValue(extbus1.get()); //pega o rpg correto
 		registersInternalRead(); //guarda o dado do rpgA no intbus2
-		//pegando o rpgB
+								//pegando o rpgB
 		PC.read();
 		memory.read(); // extbus
 		demux.setValue(extbus1.get());//agora o demux ta no rpgB
@@ -878,7 +878,6 @@ public class Architecture {
      * 4. ula -> intbus2                           // ula.internalRead(1)
      * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o endereço de parâmetro)
      * 6. pc -> extbus1                             // PC.read() coloca o endereço de parâmetro no extbus1
-     * 7. memory.read()                             // memory.read() lê o endereço da posição de memoria onde está o endereço de salto
      * 8. memory.read()                             // memory.read() lê o endereço de salto do extbus
      * 9. PC.store()                                // PC.store() atualiza o PC com o endereço de salto
      * fim
@@ -911,7 +910,6 @@ public class Architecture {
      * 4. ula -> intbus2                           // ula.internalRead(1)
      * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o parâmetro)
      * 6. pc -> extbus                             // PC.read()
-     * 7. memória -> extbus                        // memory.read() (posição da memoria onde está o endereço de salto)
      * 9. memoria -> extbus                        // memory.read() (endereço de salto no extbus)
      * 10. statusMemory(1) <- extbus                // statusMemory.storeIn1()
      * 11. ula inc                                  // ula.inc()
@@ -959,7 +957,6 @@ public class Architecture {
      * 4. ula -> intbus2                           // ula.internalRead(1)
      * 5. pc <- intbus2                            // PC.internalStore() (PC aponta para o parâmetro)
      * 6. pc -> extbus                             // PC.read()
-     * 7. memória -> extbus                        // memory.read() (posição da memoria onde está o endereço de salto)
      * 8. memória -> extbus                        // memory.read() (endereço de salto no extbus)
      * 8. statusMemory(1) <- extbus                // statusMemory.storeIn1()
      * 9. ula inc                                  // ula.inc()
@@ -1034,7 +1031,6 @@ public class Architecture {
 	 * 25. ula -> intbus2                          // ula.internalRead(1)
 	 * 26. pc <- intbus2                           // PC.internalStore() (PC aponta para o terceiro parâmetro)
 	 * 27. pc -> extbus                            // PC.read()
-	 * 28. memória -> extbus                       // memory.read() (posição de memória onde está o endereço de salto)
 	 * 29. memória -> extbus                       // memory.read() (endereço de salto no extbus)
 	 * 30. statusMemory(1) <- extbus               // statusMemory.storeIn1()
 	

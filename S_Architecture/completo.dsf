@@ -1,0 +1,43 @@
+a
+b
+jmp main
+retorna:
+ret
+soma:
+inc %RPG3
+jlw %RPG3 %RPG2 chamasoma
+ret
+chamasoma:
+call soma
+ret
+main:
+move 2 %RPG0
+move %RPG0 %RPG1
+move %RPG1 b
+move b %RPG2
+inc %RPG3
+add 3 %RPG2
+add %RPG2 b
+add b %RPG0
+add %RPG0 %RPG1
+sub 16 %RPG0
+sub b %RPG2
+sub %RPG0 %RPG2
+sub %RPG2 b
+call chamasoma
+jeq %RPG2 %RPG3 menor
+diferente:
+jneq %RPG0 %RPG1 maior
+menor:
+jlw %RPG0 %RPG1 diferente
+maior:
+jgt %RPG1 %RPG0 negative
+zero:
+move 3 %RPG0
+add %RPG0 b
+jz END
+negative:
+move -1 %RPG0
+add %RPG0 b
+jn zero
+END:

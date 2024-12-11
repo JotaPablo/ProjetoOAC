@@ -1,0 +1,43 @@
+a
+b
+c
+d
+fibResult
+jmp main
+retorno:
+ret
+Fib:
+add -1 %RPG3
+jz retorno
+move %RPG1 %RPG2
+add %RPG0 %RPG1
+move %RPG2 %RPG0
+jmp Fib
+salvaRegs:
+move %RPG0 a
+move %RPG1 b
+move %RPG2 c
+move %RPG3 d
+ret
+retornaRegs:
+move a %RPG0
+move b %RPG1
+move c %RPG2
+move d %RPG3
+ret
+iniciaFib:
+move 0 %RPG0
+move 1 %RPG1
+move 0 %RPG2
+move 5 %RPG3
+ret
+main:
+move 4 %RPG0
+move 5 %RPG1
+move 6 %RPG2
+move 7 %RPG3
+call salvaRegs
+call iniciaFib
+call Fib
+move %RPG1 fibResult
+call retornaRegs

@@ -1,0 +1,8 @@
+move 2 %RPG0
+move 2 %RPG1
+START:
+add -1 %RPG0
+jeq %RPG0 %RPG1 FIM
+add 1 %RPG0
+jmp START
+FIM:

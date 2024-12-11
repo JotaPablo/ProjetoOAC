@@ -1,0 +1,6 @@
+var1
+move 10 %RPG0
+move 5 %RPG1
+move %RPG1 var1
+add %RPG0 var1
+add var1 %RPG0

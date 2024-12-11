@@ -1,8 +1,38 @@
-move 5 %RPG0     
-move 5 %RPG1      
-começa:
+a
+b
+move 0 %RPG0
+move 1 %RPG1
+move 1 %RPG2
+move 2 %RPG3
+jmp jump
+add %REG1 a
+add %REG2 b
+jump:
+jn negative
 sub %RPG0 %RPG1 
-jeq %RPG0 %RPG1 fim        
-add 1 %RPG0     
-jmp começa 
-fim
+jn negative
+add %RPG1 a
+negative:
+jz zero
+add %RPG0 %RPG0
+jz zero
+add %RPG2 b
+zero:
+jeq %RPG0 %RPG1 equals
+jeq %RPG1 %RPG1 equals
+add %RPG1 a
+equals:
+jneq %RPG1 %RPG1 notequals
+jneq %RPG0 %RPG1 notequals
+add %RPG1 a
+notequals:
+jgt %RPG0 %RPG2 greater
+jgt %RPG2 %RPG0 greater
+add %RPG2 b
+greater:
+jlw %RPG2 %RPG1 lower
+jlw %RPG1 %RPG2 lower
+add %RPG2 b
+lower:
+move 10 %RPG3
+move %RPG3 b

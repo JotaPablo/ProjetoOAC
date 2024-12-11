@@ -126,11 +126,7 @@ public class Assembler {
 	public void parse() {
 		for (String s:lines) {
 
-
 			String tokens[] = s.split(" ");
-				
-				
-			
 			
 			if (findCommandNumber(tokens)>=0) { //the line is a command
 				proccessCommand(tokens);
@@ -140,7 +136,6 @@ public class Assembler {
 					String label = tokens[0].substring(0, tokens[0].length()-1); //removing the last character
 					labels.add(label);
 					labelsAdresses.add(objProgram.size());
-					System.out.println(objProgram);
 				}
 				else //otherwise, it must be a variable
 					variables.add(tokens[0]);

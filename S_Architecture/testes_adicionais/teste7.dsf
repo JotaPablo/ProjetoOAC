@@ -1,0 +1,18 @@
+num1
+num2
+result
+move 10 %RPG0
+move %RPG0 num1
+move 5 %RPG0
+move %RPG0 num2
+loop:
+move num1 %RPG0
+move num2 %RPG1
+jlw %RPG0 %RPG1 menor
+add -1 %RPG0
+move %RPG0 num1
+jmp loop
+menor:
+move 1 %RPG0
+move %RPG0 result
+fim:

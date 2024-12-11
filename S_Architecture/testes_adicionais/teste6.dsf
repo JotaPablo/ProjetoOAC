@@ -1,0 +1,11 @@
+result
+move 10 %RPG0
+move 10 %RPG1
+move 20 %RPG2
+jeq %RPG0 %RPG1 equal
+jneq %RPG0 %RPG1 diferente
+equals:
+move 1 result
+diferente:
+move -1 result
+END:

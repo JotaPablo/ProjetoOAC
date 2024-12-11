@@ -1,0 +1,42 @@
+a
+b
+c
+d
+quo
+resto
+jmp main
+guardaregs:
+move %RPG0 a
+move %RPG1 b
+move %RPG2 c
+move %RPG3 d
+ret
+recpregs:
+move a %RPG0
+move b %RPG1
+move c %RPG2
+move d %RPG3
+ret
+div:
+move 0 %RPG2
+move %RPG1 %RPG3     
+loopdiv:
+sub %RPG0 %RPG3    
+jn fimdiv           
+add 1 %RPG2
+move %RPG3 %RPG0
+move %RPG1 %RPG3      
+jmp loopdiv         
+fimdiv:
+add %RPG1 %RPG3
+move %RPG3 resto
+move %RPG2 quo
+ret
+main:
+move 20 %RPG0
+move 5 %RPG1
+move 3 %RPG2
+move 1 %RPG3
+call guardaregs
+call div
+call recpregs
