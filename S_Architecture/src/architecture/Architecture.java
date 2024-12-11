@@ -280,7 +280,7 @@ public class Architecture {
 	    PC.read();
 	    memory.read(); // o segundo ID de registrador está agora no barramento externo.
 	    demux.setValue(extbus1.get()); // aponta para o registrador correto
-	    registersInternalRead(); // realiza uma leitura interna do registrador identificado no barramento demux
+	    registersInternalRead();
 	    ula.internalStore(1);
 	    ula.add();
 	    ula.internalRead(1);
@@ -892,7 +892,6 @@ public class Architecture {
 		PC.internalStore(); //now PC points to the parameter address
 		PC.read();
 		memory.read();
-		memory.read();
 		PC.store();
 	}
 	
@@ -926,13 +925,12 @@ public class Architecture {
 	 * @param memory
 	 */
 	public void jz() {
-		PC.internalRead();
+		    PC.internalRead();
 	        ula.internalStore(1);
 	        ula.inc();
 	        ula.internalRead(1);
 	        PC.internalStore();
 	        PC.read();
-	        memory.read();
 	        memory.read();
 	        statusMemory.storeIn1();
 	        ula.inc();
@@ -1389,6 +1387,7 @@ public class Architecture {
 		IR.internalRead();
 		ula.internalStore(1);
 		ula.inc();
+		ula.internalRead(1);
 		IR.internalStore();
 		IR.read();
 		StkTOP.store();
@@ -1478,6 +1477,10 @@ public class Architecture {
 			     i++;
 			}
 			br.close();
+			int aux = i;
+			for(i = 0; i < aux; i++)
+			System.out.println(memory.getDataList()[i]);
+	
 	}
 	
 	/**
@@ -1621,6 +1624,8 @@ public class Architecture {
 		for (Register r:registersList) {
 			System.out.println(r.getRegisterName()+": "+r.getData());
 		}
+		System.out.println("O valor na posição 250 é: "+ memory.getDataList()[250]);
+
 		Scanner entrada = new Scanner(System.in);
 		System.out.println("Press <Enter>");
 		String mensagem = entrada.nextLine();
@@ -1661,6 +1666,7 @@ public class Architecture {
 	private boolean hasOperands(String instruction) {
 		if ("inc".equals(instruction)) //inc is the only one instruction having no operands
 			return false;
+		
 		else
 			return true;
 	}
