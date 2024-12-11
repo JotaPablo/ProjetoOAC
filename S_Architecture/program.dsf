@@ -1,7 +1,8 @@
-jmp comeca
-comeca:
-move 9 %RPG1
-move 10 %RPG2
-incrementa:
-inc %RPG1
-jeq %RPG2 %RPG1 incrementa
+move 5 %RPG0     
+move 5 %RPG1      
+começa:
+sub %RPG0 %RPG1 
+jeq %RPG0 %RPG1 fim        
+add 1 %RPG0     
+jmp começa 
+fim

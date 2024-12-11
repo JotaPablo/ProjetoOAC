@@ -1592,6 +1592,8 @@ public class Architecture {
 		System.out.println("----------BEFORE Decode and Execute phases--------------");
 		String instruction;
 		int parameter = 0;
+		int parameter2 = 0;
+		int parameter3 = 0;
 		for (Register r:registersList) {
 			System.out.println(r.getRegisterName()+": "+r.getData());
 		}
@@ -1599,9 +1601,22 @@ public class Architecture {
 			instruction = commandsList.get(command);
 		else
 			instruction = "END";
-		if (hasOperands(instruction)) {
+		
+		int operands = hasOperands(instruction);
+		if (operands == 1) {
 			parameter = memory.getDataList()[PC.getData()+1];
 			System.out.println("Instruction: "+instruction+" "+parameter);
+		}
+		else if (operands == 2) {
+			parameter = memory.getDataList()[PC.getData()+1];
+			parameter2 = memory.getDataList()[PC.getData()+2];
+			System.out.println("Instruction: "+instruction+" "+parameter+ " "+ parameter2);
+		}
+		else if (operands == 3) {
+			parameter = memory.getDataList()[PC.getData()+1];
+			parameter2 = memory.getDataList()[PC.getData()+2];
+			parameter3 = memory.getDataList()[PC.getData()+3];
+			System.out.println("Instruction: "+instruction+" "+parameter+ " "+ parameter2 + " " + parameter3);
 		}
 		else
 			System.out.println("Instruction: "+instruction);
@@ -1665,12 +1680,15 @@ public class Architecture {
 	 * @param instruction 
 	 * @return
 	 */
-	private boolean hasOperands(String instruction) {
-		if ("inc".equals(instruction)) //inc is the only one instruction having no operands
-			return false;
-		
+	private int hasOperands(String instruction) {
+		if ("ret".equals(instruction)) //inc is the only one instruction having no operands
+			return 0;
+		else if("jeq".equals(instruction) || "jneq".equals(instruction) || "jgt".equals(instruction) || "jlw".equals(instruction))
+			return 3;
+		else if("call".equals(instruction) || "inc".equals(instruction) || "jz".equals(instruction) || "jmp".equals(instruction) || "jn".equals(instruction)|| "startStk".equals(instruction))
+			return 1;
 		else
-			return true;
+			return 2;
 	}
 
 	/**
