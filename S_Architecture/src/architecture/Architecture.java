@@ -1624,7 +1624,10 @@ public class Architecture {
 		for (Register r:registersList) {
 			System.out.println(r.getRegisterName()+": "+r.getData());
 		}
-		System.out.println("O valor na posição 250 é: "+ memory.getDataList()[250]);
+		
+		int ValueStkBOT =  memory.getDataList()[1];
+		for(int i = 255; i > ValueStkBOT ; i--)
+		System.out.println("O valor na posição "+ i + ": "+ memory.getDataList()[i]);
 
 		Scanner entrada = new Scanner(System.in);
 		System.out.println("Press <Enter>");
