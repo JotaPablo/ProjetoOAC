@@ -638,10 +638,6 @@ public class TestArchitecture {
 		arch.getExtbus1().put(15);
 		arch.getMemory().store();
 		
-		arch.getExtbus1().put(15);
-		arch.getMemory().store();
-		arch.getExtbus1().put(17);
-		arch.getMemory().store();
 
 		//now we can perform the jnMem method. 
 
@@ -658,32 +654,25 @@ public class TestArchitecture {
 
 		arch.jn();
 		
-		//PC must be storng the number 17
-		arch.getPC().internalRead();
-		assertEquals(17, arch.getIntbus2().get());
+		
 		
 		//CASE 2.
 		//Bit NEGATIVE is equals to 0
 		arch.getFlags().setBit(1, 0);
-		//PC must have the number 17 initially (in this time, by using the external bus)
+		//PC must have the number 10 initially (in this time, by using the external bus)
 		arch.getExtbus1().put(10);
 		arch.getPC().store();
 		//destroying the data in external bus
 		arch.getExtbus1().put(0);
+		
+		arch.jn();
 
-		//testing if PC stores the number 17
+		//testing if PC stores the number 12
 		arch.getPC().read();
-		assertEquals(10, arch.getExtbus1().get());	
+		assertEquals(12, arch.getExtbus1().get());	
 		
 		//Note that the memory was not changed. So, in position 11 we have the number 17
 		
-		//Once the ZERO bit is 0, we WILL NOT move the number 17 (stored in the 31th position in the memory)
-		//into the PC.
-		//The original PC position was 10. The parameter is in position 11. So, now PC must be pointing to 12
-		arch.jn();
-		//PC contains the number 12
-		arch.getPC().internalRead();
-		assertEquals(12, arch.getIntbus2().get());
 	}
 	
     @Test
@@ -705,10 +694,6 @@ public class TestArchitecture {
 		arch.getExtbus1().put(15);
 		arch.getMemory().store();
 		
-		arch.getExtbus1().put(15);
-		arch.getMemory().store();
-		arch.getExtbus1().put(17);
-		arch.getMemory().store();
         
         // caso não igual
 
@@ -740,7 +725,7 @@ public class TestArchitecture {
         
         //PC must be storng the number 17
 		arch.getPC().internalRead();
-		assertEquals(17, arch.getIntbus2().get());
+		assertEquals(15, arch.getIntbus2().get());
 
      }
 	

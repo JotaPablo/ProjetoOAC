@@ -845,6 +845,7 @@ public class Architecture {
 		ula.internalRead(1);
 		PC.internalStore();
 		//pegando na memória
+		PC.read();
 		memory.read(); //agora ta no exitbus
 		demux.setValue(extbus1.get());
 		registersInternalRead(); //dado ta no intbus2
@@ -980,7 +981,6 @@ public class Architecture {
 	        PC.internalStore();
 	        PC.read();
 	        memory.read();
-	        memory.read();
 	        statusMemory.storeIn1();
 	        ula.inc();
 	        ula.internalRead(1);
@@ -1088,7 +1088,6 @@ public class Architecture {
         PC.internalStore(); // PC armazena o valor de intbus2
         PC.read(); // PC joga o valor para o extbus
         memory.read(); // memory lê o valor do extbus e joga o endereço de memória para o extbus
-        memory.read(); // memory lê o valor do extbus e joga o endereço de salto para o extbus
         statusMemory.storeIn1(); // statusMemory armazena o valor de extbus1
         ula.inc(); // ula incrementa o valor
         ula.internalRead(1); // ula joga o valor para intbus2
